@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30 Days Water Flow Monitoring</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase SDK (desabilitado para exemplo offline com dados fictícios) -->
+    <!-- <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script> -->
+</head>
+<body>
+
+    <h2>Water Flow Data - Last 30 Days</h2>
+    <canvas id="flowChart" width="400" height="200"></canvas>
+
+    <script>
+        // Função para gerar uma data no formato YYYY-MM-DD
+        function generateDate(daysAgo) {
+            const today = new Date();
+            const pastDate = new Date(today);
+            pastDate.setDate(today.getDate() - daysAgo);
+            return pastDate.toISOString().split('T')[0]; // Formato 'YYYY-MM-DD'
+        }
+
+        // Gerar dados fictícios para os últimos 30 dias
+        const labels = [];
+        const dataValues = [];
+
+        for (let i = 29; i >= 0; i--) {
+            labels.push(generateDate(i)); // Adiciona as datas no formato 'YYYY-MM-DD'
+            dataValues.push((Math.random() * 10).toFixed(2)); // Gera valores de fluxo aleatórios entre 0 e 10 L/min
+        }
+
+        // Configuração do gráfico Chart.js
+        const ctx = document.getElementById('flowChart').getContext('2d');
+        const flowChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels, // Labels do eixo X (últimos 30 dias)
+                datasets: [{
+                    label: 'Water Flow (L/min)',
+                    data: dataValues, // Dados de fluxo de água fictícios
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Flow (L/min)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Flow Monitoring - 30 Days</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+        }
+
+        /* Estilo para o menu lateral */
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            background-color: #333;
+            color: white;
+            padding-top: 20px;
+            position: fixed;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            color: white;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+
+        /* Estilo para o conteúdo principal */
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            width: 100%;
+        }
+
+        /* Estilo para o grid */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        /* Estilo para o canvas do gráfico */
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menu lateral -->
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <a href="#">Home</a>
+        <a href="#">Water Flow</a>
+        <a href="#">Settings</a>
+        <a href="#">Reports</a>
+        <a href="#">Help</a>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="main-content">
+        <h2>Water Flow Data - Last 30 Days</h2>
+        <canvas id="flowChart" width="400" height="200"></canvas>
+
+        <!-- Tabela com informações dos dados -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Water Flow (L/min)</th>
+                </tr>
+            </thead>
+            <tbody id="dataGrid">
+                <!-- Linhas da tabela serão preenchidas dinamicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Função para gerar uma data no formato YYYY-MM-DD
+        function generateDate(daysAgo) {
+            const today = new Date();
+            const pastDate = new Date(today);
+            pastDate.setDate(today.getDate() - daysAgo);
+            return pastDate.toISOString().split('T')[0]; // Formato 'YYYY-MM-DD'
+        }
+
+        // Gerar dados fictícios para os últimos 30 dias
+        const labels = [];
+        const dataValues = [];
+
+        for (let i = 29; i >= 0; i--) {
+            labels.push(generateDate(i)); // Adiciona as datas no formato 'YYYY-MM-DD'
+            dataValues.push((Math.random() * 10).toFixed(2)); // Gera valores de fluxo aleatórios entre 0 e 10 L/min
+        }
+
+        // Preencher a tabela com os dados
+        const tableBody = document.getElementById('dataGrid');
+        for (let i = 0; i < labels.length; i++) {
+            const row = document.createElement('tr');
+            const dateCell = document.createElement('td');
+            const flowCell = document.createElement('td');
+
+            dateCell.textContent = labels[i];
+            flowCell.textContent = dataValues[i];
+
+            row.appendChild(dateCell);
+            row.appendChild(flowCell);
+            tableBody.appendChild(row);
+        }
+
+        // Configuração do gráfico Chart.js
+        const ctx = document.getElementById('flowChart').getContext('2d');
+        const flowChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels, // Labels do eixo X (últimos 30 dias)
+                datasets: [{
+                    label: 'Water Flow (L/min)',
+                    data: dataValues, // Dados de fluxo de água fictícios
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Flow (L/min)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
