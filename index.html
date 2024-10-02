@@ -82,11 +82,19 @@
             margin-bottom: 30px;
         }
 
+        /* Painel com barra de rolagem para a tabela */
+        .table-panel {
+            width: 50%; /* Reduz o tamanho do painel */
+            max-height: 200px; /* Altura fixa com rolagem */
+            overflow-y: auto; /* Barra de rolagem vertical */
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+
         /* Estilo para o grid (menor) */
         table {
-            width: 50%; /* Reduz o tamanho da tabela */
+            width: 100%; /* Tabela ocupa 100% do painel */
             border-collapse: collapse;
-            margin-top: 20px;
             font-size: 0.9em; /* Texto menor na tabela */
         }
 
@@ -111,8 +119,8 @@
     <div class="sidebar" id="sidebar">
         <button class="toggle-menu" id="toggleMenuBtn">☰</button>
         <h2>Menu</h2>
-        <a href="#">Hidrometro</a>
-        <a href="#">Fluxo Água Flow</a>
+        <a href="#">Home</a>
+        <a href="#">Water Flow</a>
         <a href="#">Settings</a>
         <a href="#">Reports</a>
         <a href="#">Help</a>
@@ -127,18 +135,20 @@
             <canvas id="flowChart"></canvas>
         </div>
 
-        <!-- Tabela (reduzida) com informações dos dados -->
-        <table>
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Fluxo Água (L/min)</th>
-                </tr>
-            </thead>
-            <tbody id="dataGrid">
-                <!-- Linhas da tabela serão preenchidas dinamicamente -->
-            </tbody>
-        </table>
+        <!-- Painel com barra de rolagem para a tabela -->
+        <div class="table-panel">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Fluxo Água (L/min)</th>
+                    </tr>
+                </thead>
+                <tbody id="dataGrid">
+                    <!-- Linhas da tabela serão preenchidas dinamicamente -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
@@ -189,7 +199,7 @@
             data: {
                 labels: labels, // Labels do eixo X (últimos 30 dias)
                 datasets: [{
-                    label: 'Fluxo Água(L/min)',
+                    label: 'Water Flow (L/min)',
                     data: dataValues, // Dados de fluxo de água fictícios
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 2,
@@ -203,14 +213,14 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Data'
+                            text: 'Date'
                         }
                     },
                     y: {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Fluxo (L/min)'
+                            text: 'Flow (L/min)'
                         }
                     }
                 }
