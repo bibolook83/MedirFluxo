@@ -1,141 +1,459 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TermoSync</title>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link href="https://fonts.googleapis.com/css?family=Oxygen|Raleway&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-  <script src="./js/js-fluid-meter.js"></script>
-  <title>Document</title>
-</head>
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/10.11.1/firebase-app-compat.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/10.11.1/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/10.11.1/firebase-database-compat.js"></script>
+    <!-- 
+      <script defer src="/__/firebase/10.11.1/firebase-firestore-compat.js"></script>
+      <script defer src="/__/firebase/10.11.1/firebase-functions-compat.js"></script>
+      <script defer src="/__/firebase/10.11.1/firebase-messaging-compat.js"></script>
+      <script defer src="/__/firebase/10.11.1/firebase-storage-compat.js"></script>
+      <script defer src="/__/firebase/10.11.1/firebase-analytics-compat.js"></script>
+      <script defer src="/__/firebase/10.11.1/firebase-remote-config-compat.js"></script>
+      <script defer src="/__/firebase/10.11.1/firebase-performance-compat.js"></script> 
+      -->
+    <!-- 
+        initialize the SDK after all desired features are loaded, set useEmulator to false
+        to avoid connecting the SDK to running emulators.
+      -->
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
 
-<body>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" 
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+      integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <script src="https://cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.7/all/gauge.min.js"></script>
+    <style media="screen">
+      body { background: #FFFFFF; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div class="col-lg-8 mx-auto p-3 py-md-5">
+      <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
+        <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xodm="http://www.corel.com/coreldraw/odm/2003" xml:space="preserve" width="40" height="40" class="me-2" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 1706.66 1706.66">
+            <defs>
+             <style type="text/css"><![CDATA[.fil0{fill:url(#id0)}]]></style>
+             <linearGradient id="id0" gradientUnits="userSpaceOnUse" x1="0.02" y1="853.71" x2="1706.63" y2="853.71">
+              <stop offset="0" style="stop-opacity:1; stop-color:#FFB800"/>
+              <stop offset="1" style="stop-opacity:1; stop-color:#FF5329"/>
+             </linearGradient>
+            </defs>
+            <g id="Layer_x0020_1">
+             <path class="fil0" d="M328.78 1315l140.06 0c48.28,0 48.3,73.33 0,73.33l-177.99 0c-21.28,0 -36.67,-15.41 -36.67,-36.67 0,-40.54 4.07,-80.16 11.78,-118.46 -149.58,-17.84 -265.94,-145.44 -265.94,-299.75 0,-127.15 78.84,-239.62 197.33,-283.27 43.35,-158.48 204,-251.44 362.04,-213.39 107.6,-249.61 466.04,-239.55 560.44,14.24 169.08,-69.92 363.87,28.03 408.02,206.72 108.96,48.61 178.79,155.7 178.79,275.73 0,154.29 -116.35,281.89 -265.93,299.74 7.71,38.3 11.78,77.91 11.78,118.45 0,18.37 -13.35,36.67 -36.67,36.67l-178 0c-48.29,0 -48.28,-73.33 0,-73.33l140.07 0c-4.55,-65.79 -21.28,-128.27 -47.92,-185.24 -46.99,28.19 -128.44,76.74 -143.66,76.74 -37.3,0 -50.68,-49.77 -18.35,-68.43l126.13 -72.81c-37.55,-57.57 -86.04,-107.38 -142.52,-146.41l-74.25 128.6c-6.56,11.37 -18.68,18.33 -31.76,18.33 -28.07,0 -45.77,-30.69 -31.74,-55l74.67 -129.34c-60.48,-30.37 -127.57,-49.42 -198.5,-54.33l0 150.48c0,48.28 -73.33,48.27 -73.33,0.01l0 -150.48c-70.93,4.91 -138.02,23.96 -198.49,54.33l74.66 129.32c14.02,24.28 -3.66,55.01 -31.72,55.01 -13.11,0 -25.21,-6.97 -31.78,-18.35l-74.24 -128.59c-56.48,39.05 -105,88.85 -142.53,146.43l126.12 72.81c32.33,18.66 18.96,68.42 -18.35,68.42 -15.26,0 -96.66,-48.53 -143.65,-76.72 -26.63,56.96 -43.36,119.44 -47.91,185.22zm539.51 -42.2l93.69 -141.86c26.5,-40.13 87.67,0.29 61.17,40.42l-93.57 141.69c31.21,53.31 5.8,139.35 -76.24,139.35 -126.29,0 -115.37,-197.93 14.96,-179.6z"/>
+            </g>
+           </svg>
+          <span class="fs-4">TermoSync</span>
+        </a>
+      </header>
+    
+      <main>
+        <h1 class="text-center" id="timeValue"></h1>
+        <div class="container">
+          <div class="row pb-3 mb-5 border-bottom">
+            <div class="col">
+              <canvas id="gauge-A"></canvas>
+              <figure class="text-center" id="ambienteValue"></figure>
+            </div>
+            <div class="col">
+              <canvas id="gauge-C"></canvas>
+              <figure class="text-center" id="controladorValue"></figure>
+            </div>
+            <div class="col">
+              <canvas id="gauge-S"></canvas>
+              <figure class="text-center" id="supervisorioValue"></figure>
+            </div>
+          </div>
+          
+          <div class="row row justify-content-center align-items-center pb-3 mb-5">
+            <div class="col-md-8">
+              <h2 class="text-center mb-4">Escolha o período dos dados:</h2>
+              <form id="dateForm">
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="start" class="form-label">Escolha o início do período:</label>
+                    <input id="start" type="datetime-local" class="form-control">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="end" class="form-label">Escolha término do período:</label>
+                    <input id="end" type="datetime-local" class="form-control">
+                  </div>
+                </div>
+                <div class="row mt-4">
+                  <div class="col-md-12">
+                    <button type="submit" class="btn btn-success w-100">Buscar</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
 
-  <div class="container">
-    <div class="row">
-      <div class="col text-center">
-        <div id="fluid-meter" class="mx-auto"></div>
-        <input type="text" id="percentage-1" type="number" value="50">
-        <button id="submit-percentage-1">submit</button>
-      </div>
-      <div class="col text-center">
-        <div id="fluid-meter-2"></div>
-        <input type="text" id="percentage-2" type="number" value="50">
-        <button id="submit-percentage-2">submit</button>
-      </div>
-      <div class="col  text-center">
-        <div id="fluid-meter-3"></div>
-        <input type="text" id="percentage-3" type="number" value="50">
-        <button id="submit-percentage-3">submit</button>
-      </div>
+          <div class="row pb-3 mb-5">
+            <div class="col">
+              <canvas id="myChart"></canvas>
+            </div>
+          </div>
+          <div class="row pb-3 mb-5">
+            <div class="col">
+              <canvas id="controlador"></canvas>
+            </div>
+          </div>
+          <div class="row pb-3 mb-5">
+            <div class="col">
+              <canvas id="supervisorio"></canvas>
+            </div>
+          </div>
+          <div class="row pb-3 mb-5">
+            <div class="col">
+              <canvas id="ambiente"></canvas>
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer class="pt-5 my-5 text-muted border-top">
+        Created by the TermoSync team &middot; &copy; 2024
+        <p id="load">Firebase SDK Loading&hellip;</p>
+      </footer>
     </div>
-  </div>
-
-
-
-  <script>
-    var fm = new FluidMeter();
-    fm.init({
-      targetContainer: document.getElementById("fluid-meter"),
-      fillPercentage: 15,
-      options: {
-        fontFamily: "Raleway",
-        drawPercentageSign: false,
-        drawBubbles: true,
-        size: 300,
-        borderWidth: 19,
-        backgroundColor: "#e2e2e2",
-        foregroundColor: "#fafafa",
-        foregroundFluidLayer: {
-          fillStyle: "purple",
-          angularSpeed: 100,
-          maxAmplitude: 12,
-          frequency: 30,
-          horizontalSpeed: -150
-        },
-        backgroundFluidLayer: {
-          fillStyle: "pink",
-          angularSpeed: 100,
-          maxAmplitude: 9,
-          frequency: 30,
-          horizontalSpeed: 150
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const loadEl = document.querySelector('#load');
+        // Função para atualizar os valores exibidos nos elementos <h2>
+        function updateValues(label, ambiente, controlador, supervisorio) {
+          // Verifica se os valores são undefined antes de atualizar os elementos HTML
+          if (label !== undefined) {
+            document.getElementById("timeValue").textContent = "Última leitura: " + label;
+          }
+          if (ambiente !== undefined) {
+            document.getElementById("ambienteValue").textContent = "Ambiente: " + ambiente + " °C";
+            gaugeA.value = ambiente;
+            // console.log(gaugeA);
+            gaugeA.options.title = "Ambiente";
+            gaugeA.update();
+          }
+          if (controlador !== undefined) {
+            document.getElementById("controladorValue").textContent = "Controlador: " + controlador + " °C";
+            gaugeC.value = controlador;
+            gaugeC.options.title = "Controlador";
+            gaugeC.update();
+          }
+          if (supervisorio !== undefined) {
+            document.getElementById("supervisorioValue").textContent = "Supervisório: " + supervisorio + " °C";
+            gaugeS.value = supervisorio;
+            gaugeS.options.title = "Supervisório";
+            gaugeS.update();
+          }
         }
-      }
-    });
 
-    var fm2 = new FluidMeter();
-    fm2.init({
-      targetContainer: document.getElementById("fluid-meter-2"),
-      fillPercentage: 75,
-      options: {
-        fontFamily: "Oxygen",
-        drawPercentageSign: true,
-        drawBubbles: true,
-        size: 300,
-        borderWidth: 10,
-        backgroundColor: "#262626",
-        foregroundColor: "#4C4A4A",
-        foregroundFluidLayer: {
-          fillStyle: "#55DD10",
-          angularSpeed: 90,
-          maxAmplitude: 11,
-          frequency: 25,
-          horizontalSpeed: -200
-        },
-        backgroundFluidLayer: {
-          fillStyle: "#CDDD10",
-          angularSpeed: 100,
-          maxAmplitude: 13,
-          frequency: 23,
-          horizontalSpeed: 230
+        firebase.database().ref('readings').orderByKey().limitToLast(1).on('value',   function(snapshot) {
+          var jsonData = snapshot.toJSON();
+          // Itera sobre cada chave do JSON
+          Object.keys(jsonData).forEach(function(key) {
+            // Obtém o valor associado à chave
+            var value = jsonData[key];
+
+            // Atualiza os valores exibidos nos elementos <h2>
+            updateValues(
+              epochToDateTime(key).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' }), 
+              value.ambiente, 
+              value.controlador, 
+              value.supervisorio
+            );
+          });
+        });
+        
+        function epochToDateTime(epochTime) {
+          var epochDate = new Date(epochTime * 1000);
+          return epochDate;
         }
-      }
-    });
+        
+        var ambienteData = [];
+        var controladorData = [];
+        var supervisorioData = [];
+        var labels = [];
 
-    var fm3 = new FluidMeter();
-    fm3.init({
-      targetContainer: document.getElementById("fluid-meter-3"),
-      fillPercentage: 45,
-      options: {
-        fontSize: "30px",
-        drawPercentageSign: true,
-        drawBubbles: false,
-        size: 300,
-        borderWidth: 19,
-        backgroundColor: "#e2e2e2",
-        foregroundColor: "#fafafa",
-        foregroundFluidLayer: {
-          fillStyle: "#16E1FF",
-          angularSpeed: 30,
-          maxAmplitude: 5,
-          frequency: 30,
-          horizontalSpeed: -20
-        },
-        backgroundFluidLayer: {
-          fillStyle: "#4F8FC6",
-          angularSpeed: 100,
-          maxAmplitude: 3,
-          frequency: 22,
-          horizontalSpeed: 20
+        // TODO corrigir regras do formulario
+        // Capturando o formulário
+        var form = document.getElementById('dateForm');
+
+        // Adicionando um manipulador de eventos para o evento submit do formulário
+        form.addEventListener('submit', function (event) {
+          // Evitar o envio do formulário
+          event.preventDefault();
+
+          // Capturar os valores dos campos de entrada
+          var start = document.getElementById('start').value;
+          var end = document.getElementById('end').value;
+
+          function dateTimeToEpoch(dateTimeString) {
+            if (dateTimeString === "") {
+              return "";
+            }
+            // Criar um objeto Date a partir da string de data
+            var dateTime = new Date(dateTimeString);
+            // Obter o tempo em milissegundos desde a época
+            var epochTimeMilliseconds = dateTime.getTime();
+            // Converter para segundos e retornar
+            return Math.floor(epochTimeMilliseconds / 1000);
+          }
+
+          start = dateTimeToEpoch(start);
+          end = dateTimeToEpoch(end);
+
+          // Exibir os valores no console
+          console.log("Data de início:", start);
+          console.log("Data de término:", end);
+
+          firebase.database().ref('readings').orderByKey().startAt(String(start)).endAt(String(end)).on('value', function(snapshot) {
+            var jsonData = snapshot.toJSON();
+            // Limpa os arrays para evitar duplicatas
+            ambienteData = [];
+            controladorData = [];
+            supervisorioData = [];
+            labels = [];
+            // Itera sobre cada chave do JSON
+            Object.keys(jsonData).forEach(function(key) {
+              // Obtém o valor associado à chave
+              var value = jsonData[key];
+              // Adiciona os valores aos arrays correspondentes
+              ambienteData.push(value.ambiente);
+              controladorData.push(value.controlador);
+              supervisorioData.push(value.supervisorio);
+              labels.push(epochToDateTime(key).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' }));
+            });
+            
+            // Verifica se existe um gráfico anterior e o destrói
+            if (Chart.getChart("myChart")) {
+              Chart.getChart("myChart").destroy();
+              Chart.getChart("controlador").destroy();
+              Chart.getChart("supervisorio").destroy();
+              Chart.getChart("ambiente").destroy();
+            }
+
+            // Cria um gráfico usando Chart.js
+            new Chart(document.getElementById("myChart"), {
+              type: 'line',
+              data: {
+                labels: labels,
+                datasets: [{
+                  data: ambienteData,
+                  label: "Ambiente",
+                  borderColor: "#3e95cd",
+                  fill: false
+                }, {
+                  data: controladorData,
+                  label: "Controlador",
+                  borderColor: "#8e5ea2",
+                  fill: false
+                }, {
+                  data: supervisorioData,
+                  label: "Supervisório",
+                  borderColor: "#3cba9f",
+                  fill: false
+                }
+                ]
+              },
+              options: {
+                interaction: {
+                  intersect: false,
+                  mode: 'index',
+                },
+                plugins: {
+                  title: {
+                    display: true,
+                    text: 'Histórico de temperaturas',
+                  }
+                }
+              }
+            });
+            // Cria um gráfico usando Chart.js
+            new Chart(document.getElementById("controlador"), {
+              type: 'line',
+              data: {
+                labels: labels,
+                datasets: [{
+                  data: controladorData,
+                  label: "Controlador",
+                  borderColor: "#8e5ea2",
+                  fill: false
+                }
+                ]
+              },
+              options: {
+                interaction: {
+                  intersect: false,
+                  mode: 'index',
+                },
+                plugins: {
+                  title: {
+                    display: true,
+                    text: 'Histórico de temperaturas do controlador',
+                  }
+                }
+              }
+            });
+            // Cria um gráfico usando Chart.js
+            new Chart(document.getElementById("supervisorio"), {
+              type: 'line',
+              data: {
+                labels: labels,
+                datasets: [{
+                  data: supervisorioData,
+                  label: "Supervisório",
+                  borderColor: "#3cba9f",
+                  fill: false
+                }
+                ]
+              },
+              options: {
+                interaction: {
+                  intersect: false,
+                  mode: 'index',
+                },
+                plugins: {
+                  title: {
+                    display: true,
+                    text: 'Histórico de temperaturas do supervisório',
+                  }
+                }
+              }
+            });
+            // Cria um gráfico usando Chart.js
+            new Chart(document.getElementById("ambiente"), {
+              type: 'line',
+              data: {
+                labels: labels,
+                datasets: [{
+                  data: ambienteData,
+                  label: "Ambiente",
+                  borderColor: "#3e95cd",
+                  fill: false
+                }
+                ]
+              },
+              options: {
+                interaction: {
+                  intersect: false,
+                  mode: 'index',
+                },
+                plugins: {
+                  title: {
+                    display: true,
+                    text: 'Histórico de temperaturas ambiente',
+                  }
+                }
+              }
+            });
+          });
+        });
+        
+        // Create Temperature Gauge
+        var gaugeA = createTemperatureGauge('gauge-A');
+        var gaugeC = createTemperatureGauge('gauge-C');
+        var gaugeS = createTemperatureGauge('gauge-S');
+        gaugeA.draw();
+        gaugeC.draw();
+        gaugeS.draw();
+
+        function createTemperatureGauge(renderTo) {
+          var gauge = new RadialGauge({
+            renderTo: renderTo,
+            width: 300,
+            height: 300,
+            units: "°C",
+            // title: "Supervisorio",
+            minValue: 0,
+            startAngle: 45,
+            ticksAngle: 270,
+            maxValue: 100,
+            colorValueBoxRect: "#CCC",
+            colorValueBoxRectEnd: "#444444",
+            colorValueBoxBackground: "#fff",
+            valueDec: 2,
+            valueInt: 3,
+            majorTicks: [
+              "0",
+              "10",
+              "20",
+              "30",
+              "40",
+              "50",
+              "60",
+              "70",
+              "80",
+              "90",
+              "100"
+            ],
+            minorTicks: 4,
+            strokeTicks: true,
+            highlights: [
+              {
+                "from": 20,
+                "to": 30,
+                "color": "rgba(150, 225, 195, .75)"
+              }
+            ],
+            colorPlate: "#fff",
+            colorBarProgress: "#CC2936",
+            colorBarProgressEnd: "#049faa",
+            borderShadowWidth: 0,
+            borders: false,
+            needleType: "arrow",
+            needleWidth: 2,
+            needleCircleSize: 7,
+            needleCircleOuter: true,
+            needleCircleInner: true,
+            animationDuration: 1500,
+            animationRule: "linear",
+            barWidth: 3,
+          });
+          return gauge;
         }
-      }
-    });
 
-    window.onload = function () {
-      document.getElementById("submit-percentage-1").onclick = function () {
-        fm.setPercentage(Number(document.getElementById('percentage-1').value))
-      }
-      document.getElementById("submit-percentage-2").onclick = function () {
-        fm2.setPercentage(Number(document.getElementById('percentage-2').value))
-      }
-      document.getElementById("submit-percentage-3").onclick = function () {
-        fm3.setPercentage(Number(document.getElementById('percentage-3').value))
-      }
-    };
-  </script>
-</body>
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        // // The Firebase SDK is initialized and available here!
+        //
+        // firebase.auth().onAuthStateChanged(user => { });
+        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
+        // firebase.firestore().doc('/foo/bar').get().then(() => { });
+        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
+        // firebase.messaging().requestPermission().then(() => { });
+        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
+        // firebase.analytics(); // call to activate
+        // firebase.analytics().logEvent('tutorial_completed');
+        // firebase.performance(); // call to activate
+        //
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
+        try {
+          let app = firebase.app();
+          let features = [
+            'auth',
+            'database',
+            'firestore',
+            'functions',
+            'messaging',
+            'storage',
+            'analytics',
+            'remoteConfig',
+            'performance',
+          ].filter(feature => typeof app[feature] === 'function');
+          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
+        } catch (e) {
+          console.error(e);
+          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+        }
+      });
+    </script>
+  </body>
 </html>
