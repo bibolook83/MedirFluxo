@@ -33,12 +33,12 @@ Este projeto é um painel simples de monitoramento de fluxo de água criado com 
 
 1. Clone este repositório para sua máquina local:
 ```bash
-git clone https://github.com/your-username/water-flow-monitoring.git
+git clone https://github.com/bibolook83/MedirFluxo.git
 ```
 
 2. Navegue até a pasta do projeto:
 ```bash
-cd water-flow-monitoring
+cd MedirFluxo
 ```
 
 3. Abra o arquivo `index.html` no seu navegador para visualizar o painel:
