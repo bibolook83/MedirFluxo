@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitororando Fluxo de Água - 30 Dias</title>
+    <title>Monitorando Fluxo de Água - 30 Dias</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -15,11 +15,17 @@
         /* Estilo para o menu lateral */
         .sidebar {
             height: 100vh;
-            width: 250px;
+            width: 60px; /* Menu lateral menor */
             background-color: #333;
             color: white;
             padding-top: 20px;
             position: fixed;
+            transition: width 0.3s; /* Animação para abrir e fechar */
+            overflow: hidden;
+        }
+
+        .sidebar.open {
+            width: 250px; /* Largura do menu quando aberto */
         }
 
         .sidebar a {
@@ -28,16 +34,44 @@
             color: white;
             display: block;
             transition: 0.3s;
+            white-space: nowrap; /* Evita quebra de texto */
         }
 
         .sidebar a:hover {
             background-color: #575757;
         }
 
+        .sidebar h2 {
+            margin-left: 20px;
+            display: none;
+        }
+
+        .sidebar.open h2 {
+            display: block;
+        }
+
+        /* Botão de abrir/fechar o menu */
+        .toggle-menu {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            padding-left: 15px;
+        }
+
         /* Estilo para o conteúdo principal */
         .main-content {
-            margin-left: 250px;
+            margin-left: 60px;
             padding: 20px;
+            width: calc(100% - 60px);
+            transition: margin-left 0.3s;
+        }
+
+        .sidebar.open ~ .main-content {
+            margin-left: 250px;
             width: calc(100% - 250px);
         }
 
@@ -74,18 +108,19 @@
 <body>
 
     <!-- Menu lateral -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-menu" id="toggleMenuBtn">☰</button>
         <h2>Menu</h2>
-        <a href="#">Home</a>
-        <a href="#">Water Flow</a>
+        <a href="#">Hidrometro</a>
+        <a href="#">Fluxo Água Flow</a>
         <a href="#">Settings</a>
         <a href="#">Reports</a>
         <a href="#">Help</a>
     </div>
 
     <!-- Conteúdo principal -->
-    <div class="main-content">
-        <h2>Monitororando Fluxo de Água - 30 Dias</h2>
+    <div class="main-content" id="mainContent">
+        <h2>Monitorando Fluxo de Água - 30 Dias</h2>
 
         <!-- Gráfico (aumentado) -->
         <div class="chart-container">
@@ -107,6 +142,14 @@
     </div>
 
     <script>
+        // Função para abrir/fechar o menu lateral
+        const toggleMenuBtn = document.getElementById('toggleMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+
+        toggleMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open'); // Adiciona ou remove a classe 'open'
+        });
+
         // Função para gerar uma data no formato YYYY-MM-DD
         function generateDate(daysAgo) {
             const today = new Date();
@@ -146,7 +189,7 @@
             data: {
                 labels: labels, // Labels do eixo X (últimos 30 dias)
                 datasets: [{
-                    label: 'Water Flow (L/min)',
+                    label: 'Fluxo Água(L/min)',
                     data: dataValues, // Dados de fluxo de água fictícios
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 2,
@@ -160,14 +203,14 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Date'
+                            text: 'Data'
                         }
                     },
                     y: {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Flow (L/min)'
+                            text: 'Fluxo (L/min)'
                         }
                     }
                 }
