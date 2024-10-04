@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detecção de Anomalias no Fluxo de Água</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Resultados da Detecção de Anomalias no Fluxo de Água</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Índice</th>
+                <th>Fluxo de Água (l/min)</th>
+                <th>Erro de Reconstrução (MSE)</th>
+                <th>Anomalia</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.index }}</td>
+                <td>{{ result.flow_rate }}</td>
+                <td>{{ result.mse }}</td>
+                <td>{{ result.anomaly }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
