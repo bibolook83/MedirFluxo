@@ -14,6 +14,7 @@ body {
     position: fixed;
     transition: width 0.3s; /* Animação para abrir e fechar */
     overflow: hidden;
+    z-index: 1;
 }
 
 .sidebar.open {
