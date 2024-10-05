@@ -19,6 +19,16 @@
         th {
             background-color: #f2f2f2;
         }
+        /* Estilos para anomalias */
+        .anomaly {
+            background-color: #f8d7da; /* Vermelho claro */
+            color: #721c24; /* Texto vermelho escuro */
+        }
+        /* Estilos para não anomalias */
+        .no-anomaly {
+            background-color: #d4edda; /* Verde claro */
+            color: #155724; /* Texto verde escuro */
+        }
     </style>
 </head>
 <body>
@@ -81,6 +91,13 @@
             mseCell.textContent = mseValues[i];
             anomalyCell.textContent = anomalyResults[i];
 
+            // Verificar se é uma anomalia e aplicar a classe correta
+            if (anomalyResults[i] === 'Sim') {
+                row.classList.add('anomaly'); // Adiciona a classe para anomalias
+            } else {
+                row.classList.add('no-anomaly'); // Adiciona a classe para não anomalias
+            }
+
             row.appendChild(indexCell);
             row.appendChild(dateCell);
             row.appendChild(flowCell);
@@ -91,3 +108,4 @@
     </script>
 </body>
 </html>
+
