@@ -166,6 +166,7 @@
                     <thead>
                         <tr>
                             <th>Data</th>
+                            <th>Fluxo (L/min)</th>
                             <th>MSE</th>
                             <th>Anomalia</th>
                         </tr>
@@ -237,21 +238,24 @@
             flowTableBody.appendChild(row);
         }
 
-        // Preencher a tabela de anomalias
+        // Preencher a tabela de anomalias com a nova coluna de Fluxo
         const anomalyTableBody = document.getElementById('anomalyTableBody');
         for (let i = 0; i < labels.length; i++) {
             const row = document.createElement('tr');
             const dateCell = document.createElement('td');
+            const flowCell = document.createElement('td');
             const mseCell = document.createElement('td');
             const anomalyCell = document.createElement('td');
 
             dateCell.textContent = labels[i];
+            flowCell.textContent = flowData[i]; // Preenche com os mesmos dados de fluxo
             mseCell.textContent = mseData[i];
             anomalyCell.textContent = anomalyData[i];
 
             anomalyCell.classList.add(anomalyData[i] === 'Sim' ? 'anomaly' : 'no-anomaly');
 
             row.appendChild(dateCell);
+            row.appendChild(flowCell);  // Adiciona a nova célula de fluxo
             row.appendChild(mseCell);
             row.appendChild(anomalyCell);
             anomalyTableBody.appendChild(row);
