@@ -12,7 +12,6 @@
             display: flex;
         }
 
-        /* Estilo para o menu lateral */
         .sidebar {
             height: 100vh;
             width: 60px;
@@ -180,7 +179,6 @@
     </div>
 
     <script>
-        // Função para abrir/fechar o menu lateral
         const toggleMenuBtn = document.getElementById('toggleMenuBtn');
         const sidebar = document.getElementById('sidebar');
 
@@ -202,6 +200,14 @@
         const mseData = [];
         const anomalyData = [];
 
+        // Cálculo do MSE baseado no fluxo gerado
+        function calculateMSE(flowRate) {
+            // Usando uma média simples como base para o cálculo do erro
+            const avgFlow = 5.0; // valor fictício como referência de fluxo normal
+            const mse = Math.pow(flowRate - avgFlow, 2).toFixed(4);
+            return mse;
+        }
+
         for (let i = 29; i >= 0; i--) {
             const date = generateDate(i);
             labels.push(date);
@@ -209,7 +215,7 @@
             const flowRate = (Math.random() * 10).toFixed(2);
             flowData.push(flowRate);
 
-            const mse = (Math.random() * 0.5).toFixed(4);
+            const mse = calculateMSE(flowRate);
             mseData.push(mse);
 
             const isAnomaly = mse > 0.25 ? 'Sim' : 'Não';
