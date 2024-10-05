@@ -15,17 +15,17 @@
         /* Estilo para o menu lateral */
         .sidebar {
             height: 100vh;
-            width: 60px;
+            width: 60px; /* Menu lateral menor */
             background-color: #333;
             color: white;
             padding-top: 20px;
             position: fixed;
-            transition: width 0.3s;
+            transition: width 0.3s; /* Animação para abrir e fechar */
             overflow: hidden;
         }
 
         .sidebar.open {
-            width: 250px;
+            width: 250px; /* Largura do menu quando aberto */
         }
 
         .sidebar a {
@@ -34,7 +34,7 @@
             color: white;
             display: block;
             transition: 0.3s;
-            white-space: nowrap;
+            white-space: nowrap; /* Evita quebra de texto */
         }
 
         .sidebar a:hover {
@@ -50,6 +50,7 @@
             display: block;
         }
 
+        /* Botão de abrir/fechar o menu */
         .toggle-menu {
             background-color: #333;
             color: white;
@@ -61,6 +62,7 @@
             padding-left: 15px;
         }
 
+        /* Estilo para o conteúdo principal */
         .main-content {
             margin-left: 60px;
             padding: 20px;
@@ -73,29 +75,42 @@
             width: calc(100% - 250px);
         }
 
+        /* Tamanho maior para o gráfico */
         .chart-container {
             width: 100%;
-            height: 400px;
+            height: 500px; /* Aumenta a altura do gráfico */
             margin-bottom: 30px;
         }
 
+        /* Estilo para a tabela e a página ao lado */
         .data-panel {
             display: flex;
             justify-content: space-between;
         }
 
-        .table-panel, .anomaly-panel {
-            width: 48%;
-            max-height: 200px;
-            overflow-y: auto;
+        /* Painel com barra de rolagem para a tabela */
+        .table-panel {
+            width: 50%; /* Tamanho da tabela */
+            max-height: 200px; /* Altura fixa com rolagem */
+            overflow-y: auto; /* Barra de rolagem vertical */
             border: 1px solid #ddd;
             margin-top: 20px;
         }
 
+        /* Página em branco ao lado da tabela */
+        .blank-page {
+            width: 45%; /* Tamanho da página em branco */
+            height: 200px; /* Altura da página em branco */
+            border: 1px solid #ddd;
+            margin-top: 20px;
+            background-color: #fff; /* Cor de fundo branca */
+        }
+
+        /* Estilo para o grid (menor) */
         table {
-            width: 100%;
+            width: 100%; /* Tabela ocupa 100% do painel */
             border-collapse: collapse;
-            font-size: 0.9em;
+            font-size: 0.9em; /* Texto menor na tabela */
         }
 
         table, th, td {
@@ -110,16 +125,6 @@
         th {
             background-color: #333;
             color: white;
-        }
-
-        .anomaly {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .no-anomaly {
-            background-color: #d4edda;
-            color: #155724;
         }
     </style>
 </head>
@@ -139,42 +144,32 @@
     <div class="main-content" id="mainContent">
         <h2>Monitorando Fluxo de Água - 30 Dias</h2>
 
-        <!-- Gráfico -->
+        <!-- Gráfico (aumentado) -->
         <div class="chart-container">
             <canvas id="flowChart"></canvas>
         </div>
 
-        <!-- Painel de dados (tabela de fluxo + anomalias) -->
+        <!-- Painel de dados (tabela + página em branco) -->
         <div class="data-panel">
-            <!-- Tabela de fluxo de água -->
+            <!-- Painel com barra de rolagem para a tabela -->
             <div class="table-panel">
                 <table>
                     <thead>
                         <tr>
                             <th>Data</th>
-                            <th>Fluxo de Água (L/min)</th>
+                            <th>Fluxo Água (L/min)</th>
                         </tr>
                     </thead>
-                    <tbody id="flowTableBody">
+                    <tbody id="dataGrid">
                         <!-- Linhas da tabela serão preenchidas dinamicamente -->
                     </tbody>
                 </table>
             </div>
 
-            <!-- Tabela de anomalias -->
-            <div class="anomaly-panel">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>MSE</th>
-                            <th>Anomalia</th>
-                        </tr>
-                    </thead>
-                    <tbody id="anomalyTableBody">
-                        <!-- Linhas da tabela de anomalias serão preenchidas dinamicamente -->
-                    </tbody>
-                </table>
+            <!-- Página em branco ao lado da tabela -->
+            <!-- Página em branco ao lado da tabela -->
+            <div class="blank-page">
+                <iframe src="anomalias01.html" width="100%" height="100%" style="border:none;"></iframe>
             </div>
         </div>
     </div>
@@ -185,7 +180,7 @@
         const sidebar = document.getElementById('sidebar');
 
         toggleMenuBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
+            sidebar.classList.toggle('open'); // Adiciona ou remove a classe 'open'
         });
 
         // Função para gerar uma data no formato YYYY-MM-DD
@@ -193,62 +188,31 @@
             const today = new Date();
             const pastDate = new Date(today);
             pastDate.setDate(today.getDate() - daysAgo);
-            return pastDate.toISOString().split('T')[0];
+            return pastDate.toISOString().split('T')[0]; // Formato 'YYYY-MM-DD'
         }
 
         // Gerar dados fictícios para os últimos 30 dias
         const labels = [];
-        const flowData = [];
-        const mseData = [];
-        const anomalyData = [];
+        const dataValues = [];
 
         for (let i = 29; i >= 0; i--) {
-            const date = generateDate(i);
-            labels.push(date);
-
-            const flowRate = (Math.random() * 10).toFixed(2);
-            flowData.push(flowRate);
-
-            const mse = (Math.random() * 0.5).toFixed(4);
-            mseData.push(mse);
-
-            const isAnomaly = mse > 0.25 ? 'Sim' : 'Não';
-            anomalyData.push(isAnomaly);
+            labels.push(generateDate(i)); // Adiciona as datas no formato 'YYYY-MM-DD'
+            dataValues.push((Math.random() * 10).toFixed(2)); // Gera valores de fluxo aleatórios entre 0 e 10 L/min
         }
 
-        // Preencher a tabela de fluxo de água
-        const flowTableBody = document.getElementById('flowTableBody');
+        // Preencher a tabela com os dados
+        const tableBody = document.getElementById('dataGrid');
         for (let i = 0; i < labels.length; i++) {
             const row = document.createElement('tr');
             const dateCell = document.createElement('td');
             const flowCell = document.createElement('td');
 
             dateCell.textContent = labels[i];
-            flowCell.textContent = flowData[i];
+            flowCell.textContent = dataValues[i];
 
             row.appendChild(dateCell);
             row.appendChild(flowCell);
-            flowTableBody.appendChild(row);
-        }
-
-        // Preencher a tabela de anomalias
-        const anomalyTableBody = document.getElementById('anomalyTableBody');
-        for (let i = 0; i < labels.length; i++) {
-            const row = document.createElement('tr');
-            const dateCell = document.createElement('td');
-            const mseCell = document.createElement('td');
-            const anomalyCell = document.createElement('td');
-
-            dateCell.textContent = labels[i];
-            mseCell.textContent = mseData[i];
-            anomalyCell.textContent = anomalyData[i];
-
-            anomalyCell.classList.add(anomalyData[i] === 'Sim' ? 'anomaly' : 'no-anomaly');
-
-            row.appendChild(dateCell);
-            row.appendChild(mseCell);
-            row.appendChild(anomalyCell);
-            anomalyTableBody.appendChild(row);
+            tableBody.appendChild(row);
         }
 
         // Configuração do gráfico Chart.js
@@ -256,10 +220,10 @@
         const flowChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels,
+                labels: labels, // Labels do eixo X (últimos 30 dias)
                 datasets: [{
                     label: 'Water Flow (L/min)',
-                    data: flowData,
+                    data: dataValues, // Dados de fluxo de água fictícios
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 2,
                     fill: false
@@ -267,7 +231,7 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: false, // Permite que o gráfico preencha o contêiner
                 scales: {
                     x: {
                         title: {
