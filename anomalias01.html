@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados da Detecção de Anomalias no Fluxo de Água</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Resultados da Detecção de Anomalias no Fluxo de Água - Últimos 30 Dias</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Índice</th>
+                <th>Data</th>
+                <th>Fluxo de Água (L/min)</th>
+                <th>Erro de Reconstrução (MSE)</th>
+                <th>Anomalia</th>
+            </tr>
+        </thead>
+        <tbody id="anomalyResults">
+            <!-- Linhas serão preenchidas dinamicamente -->
+        </tbody>
+    </table>
+
+    <script>
+        // Função para gerar uma data no formato YYYY-MM-DD
+        function generateDate(daysAgo) {
+            const today = new Date();
+            const pastDate = new Date(today);
+            pastDate.setDate(today.getDate() - daysAgo);
+            return pastDate.toISOString().split('T')[0]; // Formato 'YYYY-MM-DD'
+        }
+
+        // Gerar dados fictícios para os últimos 30 dias
+        const labels = [];
+        const dataValues = [];
+        const mseValues = [];
+        const anomalyResults = [];
+
+        for (let i = 29; i >= 0; i--) {
+            labels.push(generateDate(i)); // Adiciona as datas
+            const flowRate = (Math.random() * 10).toFixed(2); // Gera fluxo aleatório entre 0 e 10 L/min
+            dataValues.push(flowRate);
+            
+            const mse = (Math.random() * 0.5).toFixed(4); // Gera erro de reconstrução aleatório
+            mseValues.push(mse);
+            
+            const anomaly = mse > 0.25 ? 'Sim' : 'Não'; // Define anomalia com base no MSE
+            anomalyResults.push(anomaly);
+        }
+
+        // Preencher a tabela com os dados
+        const tableBody = document.getElementById('anomalyResults');
+        for (let i = 0; i < labels.length; i++) {
+            const row = document.createElement('tr');
+            const indexCell = document.createElement('td');
+            const dateCell = document.createElement('td');
+            const flowCell = document.createElement('td');
+            const mseCell = document.createElement('td');
+            const anomalyCell = document.createElement('td');
+
+            indexCell.textContent = i + 1;
+            dateCell.textContent = labels[i];
+            flowCell.textContent = dataValues[i];
+            mseCell.textContent = mseValues[i];
+            anomalyCell.textContent = anomalyResults[i];
+
+            row.appendChild(indexCell);
+            row.appendChild(dateCell);
+            row.appendChild(flowCell);
+            row.appendChild(mseCell);
+            row.appendChild(anomalyCell);
+            tableBody.appendChild(row);
+        }
+    </script>
+</body>
+</html>
