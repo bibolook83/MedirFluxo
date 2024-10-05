@@ -252,7 +252,8 @@
             mseCell.textContent = mseData[i];
             anomalyCell.textContent = anomalyData[i];
 
-            anomalyCell.classList.add(anomalyData[i] === 'Sim' ? 'anomaly' : 'no-anomaly');
+            // Aplica a classe à linha inteira
+            row.classList.add(anomalyData[i] === 'Sim' ? 'anomaly' : 'no-anomaly');
 
             row.appendChild(dateCell);
             row.appendChild(flowCell);  // Adiciona a nova célula de fluxo
