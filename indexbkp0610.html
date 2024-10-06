@@ -120,14 +120,6 @@
             background-color: #d4edda;
             color: #155724;
         }
-
-        /* Estilo do iframe */
-        iframe {
-            width: 100%;
-            height: 500px; /* Ajuste a altura conforme necessário */
-            border: none; /* Remove a borda padrão */
-            margin-top: 20px;
-        }
     </style>
 </head>
 <body>
@@ -137,8 +129,8 @@
         <button class="toggle-menu" id="toggleMenuBtn">☰</button>
         <a href="#">Hidrometro</a>
         <a href="#">Fluxo de Água</a>
-        <a href="#" id="anomaliesLink">Anomalias</a>
         <a href="#">Configuração</a>
+        <a href="#">Relatórios</a>
         <a href="#">Ajuda</a>
     </div>
 
@@ -185,25 +177,14 @@
                 </table>
             </div>
         </div>
-
-        <!-- Iframe para exibir result.html -->
-        <iframe id="resultIframe" src="" style="display: none;"></iframe>
     </div>
 
     <script>
         const toggleMenuBtn = document.getElementById('toggleMenuBtn');
         const sidebar = document.getElementById('sidebar');
-        const anomaliesLink = document.getElementById('anomaliesLink');
-        const resultIframe = document.getElementById('resultIframe');
 
         toggleMenuBtn.addEventListener('click', () => {
             sidebar.classList.toggle('open');
-        });
-
-        anomaliesLink.addEventListener('click', (event) => {
-            event.preventDefault(); // Previne o comportamento padrão do link
-            resultIframe.src = "result.html"; // Define a URL do iframe
-            resultIframe.style.display = "block"; // Exibe o iframe
         });
 
         // Função para gerar uma data no formato YYYY-MM-DD

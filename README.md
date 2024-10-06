@@ -17,17 +17,18 @@ Este projeto é um painel simples de monitoramento de fluxo de água criado com 
 - **Chart.js**: Uma biblioteca poderosa para criar gráficos e visualizar dados de forma interativa.
 ## Screenshot
 
-![Water Flow Monitoring Dashboard](img/img01.jpeg)
+![Water Flow Monitoring Dashboard](/img/img01.jpeg)
 
 
-![Water Flow Monitoring Dashboard](img/img02.jpeg)
+![Water Flow Monitoring Dashboard](/img/img02.jpeg)
 
-![Water Flow Monitoring Dashboard](img/img03.jpeg)
+![Water Flow Monitoring Dashboard](/img/img03.jpeg)
 
-![Water Flow Monitoring Dashboard](img/img04.jpeg)
+![Water Flow Monitoring Dashboard](/img/img04.jpeg)
 
 ## HTML exibição
-![Water Flow Monitoring Dashboard](img/img06.png)
+![Water Flow Monitoring Dashboard](/img/img06.png)
+![Water Flow Monitoring Dashboard](/img/img07.png)
 
 ## Configuração
 
