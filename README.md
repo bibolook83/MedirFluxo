@@ -1,6 +1,6 @@
 # Painel de monitoramento de fluxo de água
 
-Este projeto é um painel simples de monitoramento de fluxo de água criado com HTML, CSS e JavaScript. Ele exibe um gráfico em tempo real de dados de fluxo de água dos últimos 30 dias, usando dados fictícios, junto com uma tabela que mostra valores detalhados de fluxo diário.
+Este projeto é um painel simples de monitoramento de fluxo de água criado com HTML, CSS e JavaScript. Ele exibe um gráfico em tempo real de dados de fluxo de água dos últimos 30 dias, usando dados gravados no firebasecloud em realtime, junto com uma tabela que mostra valores detalhados de fluxo diário.
 
 ## Recursos
 
