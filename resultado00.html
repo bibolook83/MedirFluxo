@@ -5,45 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultados da Detecção de Anomalias no Fluxo de Água</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0; /* Remove margens do corpo */
+            padding: 20px; /* Adiciona padding ao corpo */
+            box-sizing: border-box; /* Inclui padding e borda no cálculo de largura e altura */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centraliza o conteúdo na tela */
+            background-color: #f9f9f9; /* Cor de fundo clara */
+        }
         table {
-            width: 100%;
+            width: 100%; /* A tabela ocupa toda a largura disponível */
+            max-width: 800px; /* Largura máxima da tabela */
             border-collapse: collapse;
-            margin-top: 20px;
+            margin: 20px 0; /* Espaçamento entre a tabela e outros elementos */
         }
         table, th, td {
             border: 1px solid black;
         }
         th, td {
-            padding: 10px;
+            padding: 8px;
             text-align: left;
         }
         th {
             background-color: #f2f2f2;
         }
-        /* Estilos para anomalias */
         .anomaly {
             background-color: #f8d7da; /* Vermelho claro */
             color: #721c24; /* Texto vermelho escuro */
         }
-        /* Estilos para não anomalias */
         .no-anomaly {
             background-color: #d4edda; /* Verde claro */
             color: #155724; /* Texto verde escuro */
         }
+        #charts {
+            display: flex; /* Usar flexbox para dispor os gráficos lado a lado */
+            justify-content: space-between; /* Espaçamento entre os gráficos */
+            width: 100%; /* Largura total para os gráficos */
+            max-width: 800px; /* Largura máxima dos gráficos */
+            margin: 20px 0; /* Espaçamento entre os gráficos e a tabela */
+        }
         canvas {
-            width: 100%;  /* Para responsividade */
-            height: 250px; /* Ajuste a altura */
-            margin: auto;
+            width: 100%; /* Gráficos ocupam 100% do espaço disponível */
+            max-width: 390px; /* Largura máxima dos gráficos */
+            height: 200px; /* Altura dos gráficos */
+            margin: 0 10px; /* Espaçamento entre os gráficos */
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>Resultados da Detecção de Anomalias no Fluxo de Água - Últimos 30 Dias</h1>
     
-    <h2>Gráfico de Fluxo de Água</h2>
-    <canvas id="flowChart"></canvas>
-
+    <div id="charts">
+        <canvas id="flowChart"></canvas>
+        <canvas id="anomalyChart"></canvas>
+    </div>
+    
     <table>
         <thead>
             <tr>
@@ -59,122 +77,161 @@
         </tbody>
     </table>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Dados fixos para os últimos 30 dias
-        const labels = [
-            "01/09", "02/09", "03/09", "04/09", "05/09",
-            "06/09", "07/09", "08/09", "09/09", "10/09", "11/09",
-            "12/09", "13/09", "14/09", "15/09", "16/09", "17/09",
-            "18/09", "19/09", "20/09", "21/09", "22/09", "23/09",
-            "24/09", "25/09", "26/09", "27/09", "28/09", "29/09",
-            "30/09"
-        ];
+        // Dados CSV fixos
+        const csvData = `
+data;Flow Rate (L/min);MSE;Anomaly
+01/09/2024;12.69;2.31;Não
+02/09/2024;10.32;4.68;Não
+03/09/2024;18.28;3.28;Não
+04/09/2024;11.67;3.33;Não
+05/09/2024;10.38;4.62;Não
+06/09/2024;11.24;3.76;Não
+07/09/2024;10.28;4.72;Não
+08/09/2024;14.95;0.05;Não
+09/09/2024;18.17;3.17;Não
+10/09/2024;11.48;3.52;Não
+11/09/2024;16;1.00;Não
+12/09/2024;15.49;0.49;Não
+13/09/2024;17.23;2.23;Não
+14/09/2024;19.63;4.63;Não
+15/09/2024;44.69;29.69;Sim
+16/09/2024;12.87;2.13;Não
+17/09/2024;16.35;1.35;Não
+18/09/2024;16.59;1.59;Não
+19/09/2024;17.18;2.18;Não
+20/09/2024;10.92;4.08;Não
+21/09/2024;15.16;0.16;Não
+22/09/2024;10.11;4.89;Não
+23/09/2024;11.15;3.85;Não
+24/09/2024;17.04;2.04;Não
+25/09/2024;17.46;2.46;Não
+26/09/2024;15.09;0.09;Não
+27/09/2024;13.88;1.12;Não
+28/09/2024;17.5;2.50;Não
+29/09/2024;15.46;0.46;Não
+30/09/2024;19.27;4.27;Não
+        `.trim();
 
-        const flowData = [
-            12.69, 10.32, 18.28, 11.67, 10.38,
-            11.24, 10.28, 14.95, 18.17, 11.48, 16.00,
-            15.49, 17.23, 19.63, 44.69, 12.87, 16.35,
-            16.59, 17.18, 10.92, 15.16, 10.11, 11.15,
-            17.04, 17.46, 15.09, 13.88, 17.50, 15.46,
-            19.27
-        ];
+        // Função para processar o CSV e preencher a tabela e os gráficos
+        function populateTableAndCharts() {
+            const rows = csvData.split('\n').slice(1); // Ignorar o cabeçalho
+            const tableBody = document.getElementById('anomalyResults');
 
-        const mseValues = [
-            2.31, 4.68, 3.28, 3.33, 4.62,
-            3.76, 4.72, 0.05, 3.17, 3.52, 1.00,
-            0.49, 2.23, 4.63, 29.69, 2.13, 1.35,
-            1.59, 2.18, 4.08, 0.16, 4.89, 3.85,
-            2.04, 2.46, 0.09, 1.12, 2.50, 0.46,
-            4.27
-        ];
+            const labels = [];
+            const flowRates = [];
+            const anomalies = [];
 
-        const anomalyResults = [
-            'Não', 'Não', 'Não', 'Não', 'Não',
-            'Não', 'Não', 'Não', 'Não', 'Não', 'Não',
-            'Não', 'Não', 'Sim', 'Não', 'Não', 'Não',
-            'Não', 'Não', 'Não', 'Não', 'Não', 'Não',
-            'Não', 'Não', 'Não', 'Não', 'Não', 'Não',
-            'Não', 'Não', 'Não', 'Não', 'Não', 'Não',
-            'Não', 'Não', 'Não', 'Não', 'Não', 'Não',
-            'Não', 'Não'
-        ];
+            rows.forEach((row, index) => {
+                const columns = row.split(';'); // Dividir por ponto e vírgula
+                const date = columns[0];
+                const flowRate = parseFloat(columns[1]);
+                const anomaly = columns[3];
 
-        // Preencher a tabela com os dados
-        const tableBody = document.getElementById('anomalyResults');
-        for (let i = 0; i < labels.length; i++) {
-            const row = document.createElement('tr');
-            const indexCell = document.createElement('td');
-            const dateCell = document.createElement('td');
-            const flowCell = document.createElement('td');
-            const mseCell = document.createElement('td');
-            const anomalyCell = document.createElement('td');
+                labels.push(date); // Adiciona a data aos rótulos
+                flowRates.push(flowRate); // Adiciona a taxa de fluxo ao array
 
-            indexCell.textContent = i + 1;
-            dateCell.textContent = labels[i];
-            flowCell.textContent = flowData[i];
-            mseCell.textContent = mseValues[i];
-            anomalyCell.textContent = anomalyResults[i];
+                // Adiciona um indicador de anomalia (1 para anomalia, 0 para não)
+                anomalies.push(anomaly === 'Sim' ? 1 : 0);
 
-            // Verificar se é uma anomalia e aplicar a classe correta
-            if (anomalyResults[i] === 'Sim') {
-                row.classList.add('anomaly');
-            } else {
-                row.classList.add('no-anomaly');
-            }
+                const tr = document.createElement('tr');
+                const indexCell = document.createElement('td');
+                const dateCell = document.createElement('td');
+                const flowCell = document.createElement('td');
+                const mseCell = document.createElement('td');
+                const anomalyCell = document.createElement('td');
 
-            row.appendChild(indexCell);
-            row.appendChild(dateCell);
-            row.appendChild(flowCell);
-            row.appendChild(mseCell);
-            row.appendChild(anomalyCell);
-            tableBody.appendChild(row);
-        }
+                indexCell.textContent = index + 1;
+                dateCell.textContent = date;
+                flowCell.textContent = flowRate.toFixed(2);
+                mseCell.textContent = columns[2];
+                anomalyCell.textContent = anomaly;
 
-        // Criar o gráfico
-        const ctx = document.getElementById('flowChart').getContext('2d');
-        const flowChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
+                // Verificar se é uma anomalia e aplicar a classe correta
+                if (anomaly === 'Sim') {
+                    tr.classList.add('anomaly'); // Adiciona a classe para anomalias
+                } else {
+                    tr.classList.add('no-anomaly'); // Adiciona a classe para não anomalias
+                }
+
+                tr.appendChild(indexCell);
+                tr.appendChild(dateCell);
+                tr.appendChild(flowCell);
+                tr.appendChild(mseCell);
+                tr.appendChild(anomalyCell);
+                tableBody.appendChild(tr);
+            });
+
+            // Criar gráfico de fluxo
+            const ctxFlow = document.getElementById('flowChart').getContext('2d');
+            new Chart(ctxFlow, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
                         label: 'Fluxo de Água (L/min)',
-                        data: flowData,
+                        data: flowRates,
                         borderColor: 'blue',
                         backgroundColor: 'rgba(0, 0, 255, 0.1)',
                         fill: true,
-                        pointRadius: 0 // Esconde os pontos normais
-                    },
-                    {
-                        label: 'Anomalias',
-                        data: flowData.map((flow, index) => anomalyResults[index] === 'Sim' ? flow : null), // Mostra apenas os fluxos onde há anomalia
-                        borderColor: 'red',
-                        backgroundColor: 'rgba(255, 0, 0, 0.5)',
-                        pointRadius: 5, // Destaca os pontos de anomalias
-                        pointStyle: 'circle',
-                        fill: false // Não preenche a área do gráfico
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Fluxo de Água (L/min)'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Datas'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Fluxo de Água (L/min)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Data'
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+
+            // Criar gráfico de anomalias
+            const ctxAnomaly = document.getElementById('anomalyChart').getContext('2d');
+            new Chart(ctxAnomaly, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Anomalias Detectadas',
+                        data: anomalies,
+                        backgroundColor: anomalies.map(a => a === 1 ? 'red' : 'green'),
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Anomalias'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Data'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Chamar a função para preencher a tabela e os gráficos ao carregar a página
+        window.onload = populateTableAndCharts;
     </script>
 </body>
 </html>
