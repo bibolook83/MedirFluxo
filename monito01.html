@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitorando Fluxo de Água - 30 Dias</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .main-content {
+            width: 100%;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+
+        .data-panel {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .table-panel, .anomaly-panel {
+            width: 48%;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        .anomaly {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .no-anomaly {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Conteúdo principal -->
+    <div class="main-content" id="mainContent">
+        <h2>Monitorando Fluxo de Água</h2>
+
+        <!-- Gráfico -->
+        <div class="chart-container">
+            <canvas id="flowChart"></canvas>
+        </div>
+
+        <!-- Painel de dados (tabela de fluxo + anomalias) -->
+        <div class="data-panel">
+            <!-- Tabela de fluxo de água -->
+            <div class="table-panel">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Fluxo de Água (L/min)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flowTableBody">
+                        <!-- Linhas da tabela serão preenchidas dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tabela de anomalias -->
+            <div class="anomaly-panel">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Fluxo (L/min)</th>
+                            <th>MSE</th>
+                            <th>Anomalia</th>
+                        </tr>
+                    </thead>
+                    <tbody id="anomalyTableBody">
+                        <!-- Linhas da tabela de anomalias serão preenchidas dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados fixos do CSV
+        const csvData = `
+data;Flow Rate (L/min);MSE;Anomaly
+01/08/2024;11.91;3.09;Não
+02/08/2024;15.47;0.47;Não
+03/08/2024;16.82;1.82;Não
+04/08/2024;18.5;3.50;Não
+05/08/2024;15.95;0.95;Não
+06/08/2024;15.52;0.52;Não
+07/08/2024;17.35;2.35;Não
+08/08/2024;19.27;4.27;Não
+09/08/2024;15.77;0.77;Não
+10/08/2024;15.55;0.55;Não
+11/08/2024;15.75;0.75;Não
+12/08/2024;41.99;26.99;Sim
+13/08/2024;13.23;1.77;Não
+14/08/2024;11.69;3.31;Não
+15/08/2024;10.35;4.65;Não
+16/08/2024;13.28;1.72;Não
+17/08/2024;14.67;0.33;Não
+18/08/2024;17.04;2.04;Não
+19/08/2024;13.58;1.42;Não
+20/08/2024;11.67;3.33;Não
+21/08/2024;19.76;4.76;Não
+22/08/2024;16.49;1.49;Não
+23/08/2024;14.65;0.35;Não
+24/08/2024;16.03;1.03;Não
+25/08/2024;15.56;0.56;Não
+26/08/2024;19.62;4.62;Não
+27/08/2024;12.62;2.38;Não
+28/08/2024;16.27;1.27;Não
+29/08/2024;12.79;2.21;Não
+30/08/2024;18.28;3.28;Não
+31/08/2024;19.52;4.52;Não
+01/09/2024;12.69;2.31;Não
+02/09/2024;10.32;4.68;Não
+03/09/2024;18.28;3.28;Não
+04/09/2024;11.67;3.33;Não
+05/09/2024;10.38;4.62;Não
+06/09/2024;11.24;3.76;Não
+07/09/2024;10.28;4.72;Não
+08/09/2024;14.95;0.05;Não
+09/09/2024;18.17;3.17;Não
+10/09/2024;11.48;3.52;Não
+11/09/2024;16;1.00;Não
+12/09/2024;15.49;0.49;Não
+13/09/2024;17.23;2.23;Não
+14/09/2024;19.63;4.63;Não
+15/09/2024;44.69;29.69;Sim
+16/09/2024;12.87;2.13;Não
+17/09/2024;16.35;1.35;Não
+18/09/2024;16.59;1.59;Não
+19/09/2024;17.18;2.18;Não
+20/09/2024;10.92;4.08;Não
+21/09/2024;15.16;0.16;Não
+22/09/2024;10.11;4.89;Não
+23/09/2024;11.15;3.85;Não
+24/09/2024;17.04;2.04;Não
+25/09/2024;17.46;2.46;Não
+26/09/2024;15.09;0.09;Não
+27/09/2024;13.88;1.12;Não
+28/09/2024;17.5;2.50;Não
+29/09/2024;15.46;0.46;Não
+30/09/2024;19.27;4.27;Não
+01/10/2024;15.76;0.76;Não
+02/10/2024;14.82;0.18;Não
+03/10/2024;14.36;0.64;Não
+04/10/2024;10.84;4.16;Não
+05/10/2024;12.1;2.90;Não
+06/10/2024;17.2;2.20;Não
+07/10/2024;12.07;2.93;Não
+08/10/2024;14.06;0.94;Não
+09/10/2024;12.95;2.05;Não
+10/10/2024;13.93;1.07;Não
+11/10/2024;13.37;1.63;Não
+12/10/2024;17.49;2.49;Não
+13/10/2024;10.06;4.94;Não
+14/10/2024;11.4;3.60;Não
+15/10/2024;16.63;1.63;Não
+16/10/2024;12.11;2.89;Não
+17/10/2024;14.66;0.34;Não
+18/10/2024;16.35;1.35;Não
+19/10/2024;15.6;0.60;Não
+20/10/2024;11.63;3.37;Não
+21/10/2024;18.87;3.87;Não
+22/10/2024;13.21;1.79;Não
+23/10/2024;11.31;3.69;Não
+24/10/2024;17.07;2.07;Não
+25/10/2024;18.04;3.04;Não
+26/10/2024;12.51;2.49;Não
+27/10/2024;19.1;4.10;Não
+28/10/2024;14.64;0.36;Não
+29/10/2024;44.33;29.33;Sim
+30/10/2024;19.72;4.72;Não
+31/10/2024;12.17;2.83;Não
+01/11/2024;15.92;0.92;Não
+02/11/2024;14.71;0.29;Não
+03/11/2024;17.54;2.54;Não
+04/11/2024;14.54;0.46;Não
+05/11/2024;15.92;0.92;Não
+06/11/2024;17.5;2.50;Não
+07/11/2024;16.39;1.39;Não
+08/11/2024;15.53;0.53;Não
+        `;
+
+        // Converter CSV em arrays de dados
+        const rows = csvData.trim().split('\n').slice(1); // Ignora a primeira linha (cabeçalho)
+        const labels = [];
+        const flowData = [];
+        const mseData = [];
+        const anomalyData = [];
+
+        rows.forEach(row => {
+            const [date, flowRate, mse, anomaly] = row.split(';');
+            labels.push(date);
+            flowData.push(parseFloat(flowRate));
+            mseData.push(parseFloat(mse));
+            anomalyData.push(anomaly);
+        });
+
+        // Preencher a tabela de fluxo de água
+        const flowTableBody = document.getElementById('flowTableBody');
+        for (let i = 0; i < labels.length; i++) {
+            const row = document.createElement('tr');
+            const dateCell = document.createElement('td');
+            const flowCell = document.createElement('td');
+
+            dateCell.textContent = labels[i];
+            flowCell.textContent = flowData[i].toFixed(2);
+
+            row.appendChild(dateCell);
+            row.appendChild(flowCell);
+            flowTableBody.appendChild(row);
+        }
+
+        // Preencher a tabela de anomalias com os dados fixos
+        const anomalyTableBody = document.getElementById('anomalyTableBody');
+        for (let i = 0; i < labels.length; i++) {
+            const row = document.createElement('tr');
+            const dateCell = document.createElement('td');
+            const flowCell = document.createElement('td');
+            const mseCell = document.createElement('td');
+            const anomalyCell = document.createElement('td');
+
+            dateCell.textContent = labels[i];
+            flowCell.textContent = flowData[i].toFixed(2); // Preenche com os mesmos dados de fluxo
+            mseCell.textContent = mseData[i].toFixed(2);
+            anomalyCell.textContent = anomalyData[i];
+
+            // Aplica a classe à linha inteira
+            row.classList.add(anomalyData[i] === 'Sim' ? 'anomaly' : 'no-anomaly');
+
+            row.appendChild(dateCell);
+            row.appendChild(flowCell);  // Adiciona a nova célula de fluxo
+            row.appendChild(mseCell);
+            row.appendChild(anomalyCell);
+            anomalyTableBody.appendChild(row);
+        }
+
+        // Dados para o gráfico de anomalias (somente onde houver anomalias)
+        const anomalyFlowData = flowData.map((flow, index) => anomalyData[index] === 'Sim' ? flow : null);
+
+        // Configuração do gráfico Chart.js
+        const ctx = document.getElementById('flowChart').getContext('2d');
+        const flowChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Water Flow (L/min)',
+                        data: flowData,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)', // Cor de preenchimento abaixo da linha
+                        fill: true // Preenche a área abaixo da linha
+                    },
+                    {
+                        label: 'Anomalies',
+                        data: anomalyFlowData,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        pointBackgroundColor: 'red',
+                        pointBorderColor: 'red',
+                        pointRadius: 5, // Ponto maior para destacar anomalias
+                        showLine: false // Não desenhar a linha entre os pontos de anomalia
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Flow (L/min)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
