@@ -46,7 +46,7 @@ cd MedirFluxo
 - Você pode simplesmente arrastar o arquivo para o seu navegador ou clicar com o botão direito e escolher "Abrir com" para visualizar a página.
 
 
-Este projeto de Painel de Monitoramento de Fluxo de Água pode ser aprimorado com a inclusão de Machine Learning para detecção de anomalias no fluxo de água. A ideia é utilizar um Autoencoder para detectar padrões irregulares nos dados de fluxo de água e identificar possíveis anomalias, como vazamentos ou mau funcionamento de equipamentos.
+Este projeto de Painel de Monitoramento de Fluxo de Água inclii um sistema de Machine Learning para detecção de anomalias no fluxo de água. A ideia é utilizar um Autoencoder para detectar padrões irregulares nos dados de fluxo de água e identificar possíveis anomalias, como vazamentos ou mau funcionamento de equipamentos.
 
 Estrutura da Adição de Machine Learning
 
