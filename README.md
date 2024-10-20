@@ -15,7 +15,17 @@ Este projeto consiste em um painel de monitoramento de fluxo de água, desenvolv
 - **CSS3**: para layout e estilo, incluindo uma barra lateral responsiva e design de grade.
 - **JavaScript**: para gerar dinamicamente os dados do gráfico e da tabela.
 - **Chart.js**: Uma biblioteca poderosa para criar gráficos e visualizar dados de forma interativa.
+
 ## Screenshot
+
+![Water Flow Monitoring Dashboard](/img/img01.jpeg)
+![Water Flow Monitoring Dashboard](/img/img02.jpeg)
+![Water Flow Monitoring Dashboard](/img/img03.jpeg)
+![Water Flow Monitoring Dashboard](/img/img04.jpeg)
+
+## HTML Exibição
+![Water Flow Monitoring Dashboard](/img/img06.png)
+![Water Flow Monitoring Dashboard](/img/img07.png)
 
 
 ## Configuração
@@ -64,17 +74,6 @@ Este projeto consiste em um painel de monitoramento de fluxo de água, desenvolv
 - **JavaScript**: para gerar dinamicamente os dados do gráfico e da tabela.
 - **Chart.js**: Uma biblioteca poderosa para criar gráficos e visualizar dados de forma interativa.
 - **Firebase Realtime Database**: Para armazenamento e atualização em tempo real dos dados de fluxo de água.
-
-## Screenshot
-
-![Water Flow Monitoring Dashboard](/img/img01.jpeg)
-![Water Flow Monitoring Dashboard](/img/img02.jpeg)
-![Water Flow Monitoring Dashboard](/img/img03.jpeg)
-![Water Flow Monitoring Dashboard](/img/img04.jpeg)
-
-## HTML Exibição
-![Water Flow Monitoring Dashboard](/img/img06.png)
-![Water Flow Monitoring Dashboard](/img/img07.png)
 
 ## Detalhes Adicionais do Projeto: ESP8266, OLED Display, YF-S201 e Firebase Realtime Database
 
