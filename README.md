@@ -52,11 +52,8 @@ water-flow-monitoring/
 ├── README.md # Este arquivo README com detalhes do projeto
 └── assets/ # Pasta para quaisquer ativos futuros (imagens, estilos, etc.)
 
-Aqui está a versão atualizada do seu arquivo README.md, com a inclusão dos detalhes do projeto com ESP8266, OLED Display, YF-S201 e Firebase Realtime Database:
 
----
-
-# Painel de Monitoramento de Fluxo de Água
+## Painel de Monitoramento de Fluxo de Água
 
 Este projeto consiste em um painel de monitoramento de fluxo de água, desenvolvido com HTML, CSS e JavaScript. O painel exibe um gráfico interativo em tempo real, visualizando os dados de fluxo de água registrados nos últimos 30 dias. Os dados são armazenados e atualizados continuamente no Firebase Realtime Database, garantindo a visualização em tempo real. Além disso, o painel apresenta uma tabela detalhada que lista os valores de fluxo diário, proporcionando uma análise mais aprofundada do consumo de água.
 
