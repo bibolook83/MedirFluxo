@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Flow Monitoring</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        #flowRateChart {
+            width: 100%;
+            height: auto;
+        }
+
+        .table-container {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+        }
+
+        /* Colorir linhas sem anomalias de verde */
+        .no-anomaly {
+            background-color: #ccffcc;
+        }
+
+        /* Colorir anomalias de vermelho */
+        .anomaly {
+            background-color: #ffcccc;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                padding: 0 10px;
+            }
+
+            th, td {
+                padding: 5px;
+            }
+
+            #flowRateChart {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #flowRateChart {
+                height: 250px;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Monitoramento de Fluxo de Água</h1>
+
+        <h2>Gráfico de Fluxo de Água</h2>
+        <canvas id="flowRateChart"></canvas>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Index</th>
+                        <th>Flow Rate (L/min)</th>
+                        <th>MSE (Simulado)</th>
+                        <th>Anomaly</th>
+                    </tr>
+                </thead>
+                <tbody id="data-table-body">
+                    <!-- Os dados serão preenchidos via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Função para gerar dados aleatórios
+        function generateRandomData(numEntries = 100) {
+            let data = [];
+            for (let i = 0; i < numEntries; i++) {
+                let flowRate = Math.random() < 0.95 ? (Math.random() * 10 + 10).toFixed(2) : (Math.random() * 20 + 30).toFixed(2); // 95% normal, 5% outliers
+                data.push({ index: i, flow_rate: parseFloat(flowRate) });
+            }
+            return data;
+        }
+
+        // Função para calcular MSE simulado e identificar anomalias
+        function detectAnomalies(data) {
+            const threshold = 25; // Definindo um limiar simples
+            return data.map(item => {
+                const mse = Math.abs(item.flow_rate - 15).toFixed(2);
+                const anomaly = item.flow_rate > threshold ? 'Sim' : 'Não';
+                return { ...item, mse, anomaly };
+            });
+        }
+
+        // Função para preencher a tabela
+        function fillTable(data) {
+            const tableBody = document.getElementById('data-table-body');
+            tableBody.innerHTML = ''; // Limpar a tabela antes de preencher
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = row.anomaly === 'Sim' ? 'anomaly' : 'no-anomaly';
+                tr.innerHTML = `
+                    <td>${row.index}</td>
+                    <td>${row.flow_rate}</td>
+                    <td>${row.mse}</td>
+                    <td>${row.anomaly}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Função para renderizar o gráfico
+        function renderChart(data) {
+            const ctx = document.getElementById('flowRateChart').getContext('2d');
+            const flowData = data.map(item => item.flow_rate);
+            const labels = data.map(item => item.index);
+            
+            // Definir as cores dos pontos com base em anomalias
+            const pointColors = data.map(item => item.anomaly === 'Sim' ? 'red' : 'green');
+            
+            // Definir os tamanhos dos pontos para destacar anomalias
+            const pointRadius = data.map(item => item.anomaly === 'Sim' ? 6 : 3);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Flow Rate (L/min)',
+                        data: flowData,
+                        borderColor: '#007bff',
+                        borderWidth: 2,
+                        pointBackgroundColor: pointColors, // Cores dos pontos
+                        pointRadius: pointRadius, // Tamanho dos pontos
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Index'
+                            },
+                            beginAtZero: true
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Flow Rate (L/min)'
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#333'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Gerar dados e executar as funções de tabela e gráfico
+        const data = generateRandomData();
+        const processedData = detectAnomalies(data);
+        fillTable(processedData);
+        renderChart(processedData);
+    </script>
+</body>
+</html>

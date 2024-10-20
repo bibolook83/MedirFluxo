@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dados de Fluxo de Água</title>
+    <script type="module">
+        // Importando o Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-database.js";
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_X_xsHnaoR6C2J6jv-wWumjXR9WqN3Qk",
+            authDomain: "medirfluxo-32f34.firebaseapp.com",
+            databaseURL: "https://medirfluxo-32f34-default-rtdb.firebaseio.com",
+            projectId: "medirfluxo-32f34",
+            storageBucket: "medirfluxo-32f34.appspot.com",
+            messagingSenderId: "980628257906",
+            appId: "1:980628257906:web:f2dc301e7c92fa6c0296eb",
+            measurementId: "G-53402DEHS6"
+        };
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        // Variáveis para armazenar os dados do gráfico
+        let timestamps = [];
+        let taxasDeFluxo = [];
+        let volumes = [];
+        let fluxoChart;
+
+        // Função para monitorar os dados em tempo real e atualizá-los na tabela e gráfico
+        function monitorData() {
+            const fluxoRef = ref(database, 'fluxo/leituras');
+            onValue(fluxoRef, (snapshot) => {
+                const data = snapshot.val();
+                const dataTable = document.getElementById('data-table').getElementsByTagName('tbody')[0];
+
+                // Limpa a tabela antes de inserir novos dados
+                dataTable.innerHTML = '';
+
+                // Limpa os dados do gráfico
+                timestamps = [];
+                taxasDeFluxo = [];
+                volumes = [];
+
+                if (data) {
+                    const taxaDeFluxoKeys = Object.keys(data.taxa_de_fluxo);
+                    const timestampKeys = Object.keys(data.timestamp);
+                    const volumeKeys = Object.keys(data.volume);
+
+                    // Verifica se as chaves têm o mesmo tamanho
+                    if (taxaDeFluxoKeys.length === timestampKeys.length && taxaDeFluxoKeys.length === volumeKeys.length) {
+                        for (let i = 0; i < taxaDeFluxoKeys.length; i++) {
+                            const row = dataTable.insertRow();
+                            const timestampCell = row.insertCell(0);
+                            const fluxoCell = row.insertCell(1);
+                            const volumeCell = row.insertCell(2);
+
+                            timestampCell.textContent = data.timestamp[timestampKeys[i]];
+                            fluxoCell.textContent = data.taxa_de_fluxo[taxaDeFluxoKeys[i]];
+                            volumeCell.textContent = data.volume[volumeKeys[i]];
+
+                            // Adiciona dados ao gráfico
+                            timestamps.push(data.timestamp[timestampKeys[i]]);
+                            taxasDeFluxo.push(data.taxa_de_fluxo[taxaDeFluxoKeys[i]]);
+                            volumes.push(data.volume[volumeKeys[i]]);
+                        }
+
+                        updateChart(); // Atualiza o gráfico
+                    } else {
+                        console.log("Número de registros desigual");
+                    }
+                } else {
+                    console.log("No data available");
+                }
+            });
+        }
+
+        // Função para atualizar o gráfico
+        function updateChart() {
+            const ctx = document.getElementById('fluxoChart').getContext('2d');
+
+            // Verifica se o gráfico já existe
+            if (fluxoChart) {
+                fluxoChart.data.labels = timestamps; // Atualiza os rótulos
+                fluxoChart.data.datasets[0].data = taxasDeFluxo; // Atualiza os dados da taxa de fluxo
+                fluxoChart.data.datasets[1].data = volumes; // Atualiza os dados do volume
+                fluxoChart.update(); // Atualiza o gráfico
+            } else {
+                // Cria um novo gráfico
+                fluxoChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: timestamps,
+                        datasets: [{
+                            label: 'Taxa de Fluxo',
+                            data: taxasDeFluxo,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2,
+                            fill: false
+                        }, {
+                            label: 'Volume',
+                            data: volumes,
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 2,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Data'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Valores'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Chama a função para monitorar os dados em tempo real
+        monitorData();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Adicionando Chart.js -->
+    <style>
+        table {
+            width: 70%; /* Largura da tabela */
+            margin: 20px auto; /* Centralizando a tabela */
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 2px; /* Padding das células */
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #chart-container {
+            width: 100%;
+            max-width: 900px; /* Aumentando a largura máxima do gráfico */
+            margin: auto;
+            height: 450px; /* Aumentando a altura do gráfico */
+        }
+    </style>
+</head>
+<body>
+    <h1>Dados de Fluxo de Água</h1>
+    <div id="chart-container">
+        <canvas id="fluxoChart"></canvas> <!-- Elemento do gráfico -->
+    </div>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Taxa de Fluxo</th>
+                <th>Volume</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Os dados serão inseridos aqui -->
+        </tbody>
+    </table>
+</body>
+</html>

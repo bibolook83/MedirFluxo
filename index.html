@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <title>Monitoramento do Fluxo de Água</title>
+        <!--CSS-->
+    <link rel="stylesheet" href="css/stylemenu.css">
+    <!-- Boxicons CDN Link -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      /* Estilo para o iframe */
+      .home-section iframe {
+        width: 100%;
+        height: calc(100vh - 40px); /* Ajusta a altura do iframe para ocupar todo o espaço restante na tela */
+        border: none;
+      }
+    </style>
+  </head>
+<body>
+  <div class="sidebar">
+    <!-- Seu conteúdo da barra lateral aqui -->
+        <div class="logo-details">
+          <i class='bx bxl-tux icon'></i>
+            <div class="logo_name">PI IV</div>
+            <i class='bx bx-menu' id="btn" ></i>
+        </div>
+        <ul class="nav-list">
+          <li>
+              <i class='bx bx-search' ></i>
+             <input type="text" placeholder="Search...">
+             <span class="tooltip">Search</span>
+          </li>
+          <li>
+            <a href="#" onclick="openPage('monito01.html')">
+              <i class='bx bx-grid-alt'></i>
+              <span class="links_name">Home</span>
+            </a>
+             <span class="tooltip">Home</span>
+          </li>
+          <li>
+           <a href="#" onclick="openPage('anomalias.html')">
+             <i class='bx bx-user' ></i>
+             <span class="links_name">Anomalias</span>
+           </a>
+           <span class="tooltip">Anomalias</span>
+         </li>
+         <li>
+           <a href="#" onclick="openPage('resultado00.html')">
+             <i class='bx bx-chat' ></i>
+             <span class="links_name">Relatório Mensal</span>
+           </a>
+           <span class="tooltip">Relatório Mensal</span>
+         </li>
+         <li>
+           <a href="#" onclick="openPage('anomalias01.html')">
+             <i class='bx bx-pie-chart-alt-2' ></i>
+             <span class="links_name">Resultados</span>
+           </a>
+           <span class="tooltip">Resultados</span>
+         </li>
+         <li>
+           <a href="#" onclick="openPage('graficorealtime.html')"> 
+             <i class='bx bx-folder' ></i>
+             <span class="links_name">Gráfico realtime</span>
+           </a>
+           <span class="tooltip">Gráfico realtime</span>
+         </li>
+         <li>
+           <a href="#" onclick="openPage('dadosrealtime.html')">
+             <i class='bx bx-cart-alt' ></i>
+             <span class="links_name">Dados realtime</span>
+           </a>
+           <span class="tooltip">Dados realtime</span>
+         </li>
+         <li>
+           <a href="#" onclick="openPage('monito01.html')">
+             <i class='bx bx-heart' ></i>
+             <span class="links_name">---------------</span>
+           </a>
+           <span class="tooltip">---------------</span>
+         </li>
+         <li>
+           <a href="#" onclick="openPage('monito01.html')">
+             <i class='bx bx-cog' ></i>
+             <span class="links_name">---------------</span>
+           </a>
+           <span class="tooltip">---------------</span>
+         </li>
+         <li class="profile">
+             <div class="profile-details">
+               <img src="img/user.png" alt="profileImg">
+               <div class="name_job">
+                 <div class="name">Bibolook</div>
+                 <div class="job">Web designer</div>
+               </div>
+             </div>
+             <i class='bx bx-log-out' id="log_out" ></i>
+         </li>
+        </ul>
+  </div>
+  
+    <section class="home-section">
+      <div class="text">Monitoramento do Fluxo de Água</div>
+      <iframe id="pageFrame" src="monito01.html"></iframe>
+    </section>
+
+  <script>
+    let sidebar = document.querySelector(".sidebar");
+    let closeBtn = document.querySelector("#btn");
+    let searchBtn = document.querySelector(".bx-search");
+
+    closeBtn.addEventListener("click", ()=>{
+      sidebar.classList.toggle("open");
+      menuBtnChange(); // Chamando a função para alterar o ícone do botão (opcional)
+    });
+
+    searchBtn.addEventListener("click", ()=>{ // Abrir a barra lateral quando você clicar no ícone de pesquisa
+      sidebar.classList.toggle("open");
+      menuBtnChange(); // Chamando a função para alterar o ícone do botão (opcional)
+    });
+
+    // Função para alterar o ícone do botão da barra lateral (opcional)
+    function menuBtnChange() {
+      if(sidebar.classList.contains("open")){
+        closeBtn.classList.replace("bx-menu", "bx-menu-alt-right"); // Substituindo a classe de ícones
+      } else {
+        closeBtn.classList.replace("bx-menu-alt-right","bx-menu"); // Substituindo a classe de ícones
+      }
+    }
+
+    // Função para abrir uma página no iframe
+    function openPage(url) {
+      document.getElementById('pageFrame').src = url;
+    }
+  </script>
+  <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoramento de Fluxo de Água</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .chart-container {
+            border: 1px solid #ddd; /* Borda do frame */
+            border-radius: 8px; /* Bordas arredondadas */
+            padding: 10px; /* Espaçamento interno */
+            margin-bottom: 20px; /* Espaçamento abaixo do gráfico */
+            background-color: #f9f9f9; /* Cor de fundo do frame */
+        }
+        canvas {
+            display: block; /* Garante que o canvas seja um bloco para ocupar toda a largura */
+            width: 100% !important; /* Garante que o canvas ocupe 100% da largura */
+            height: auto; /* Altera para auto para manter a proporção */
+            margin: 0; /* Remove margens */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        /* Adicionando cores alternadas às linhas da tabela */
+        tr:nth-child(even) {
+            background-color: #f9f9f9; /* Cor para linhas pares */
+        }
+        tr:nth-child(odd) {
+            background-color: #ffffff; /* Cor para linhas ímpares */
+        }
+        tr:hover {
+            background-color: #e2e2e2; /* Cor para linha ao passar o mouse */
+        }
+    </style>
+</head>
+<body>
+
+<h1>Monitoramento de Fluxo de Água</h1>
+
+<div class="chart-container">
+    <canvas id="myChart"></canvas>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Taxa de Fluxo (L/min)</th>
+            <th>MSE</th>
+            <th>Anomalia</th>
+        </tr>
+    </thead>
+    <tbody id="data-table-body">
+        <!-- As linhas da tabela serão preenchidas aqui -->
+    </tbody>
+</table>
+
+<script>
+    const data = `data;Flow Rate (L/min);MSE;Anomaly
+01/08/2024;11.91;3.09;Não
+02/08/2024;15.47;0.47;Não
+03/08/2024;16.82;1.82;Não
+04/08/2024;18.5;3.50;Não
+05/08/2024;15.95;0.95;Não
+06/08/2024;15.52;0.52;Não
+07/08/2024;17.35;2.35;Não
+08/08/2024;19.27;4.27;Não
+09/08/2024;15.77;0.77;Não
+10/08/2024;15.55;0.55;Não
+11/08/2024;15.75;0.75;Não
+12/08/2024;41.99;26.99;Sim
+13/08/2024;13.23;1.77;Não
+14/08/2024;11.69;3.31;Não
+15/08/2024;10.35;4.65;Não
+16/08/2024;13.28;1.72;Não
+17/08/2024;14.67;0.33;Não
+18/08/2024;17.04;2.04;Não
+19/08/2024;13.58;1.42;Não
+20/08/2024;11.67;3.33;Não
+21/08/2024;19.76;4.76;Não
+22/08/2024;16.49;1.49;Não
+23/08/2024;14.65;0.35;Não
+24/08/2024;16.03;1.03;Não
+25/08/2024;15.56;0.56;Não
+26/08/2024;19.62;4.62;Não
+27/08/2024;12.62;2.38;Não
+28/08/2024;16.27;1.27;Não
+29/08/2024;12.79;2.21;Não
+30/08/2024;18.28;3.28;Não
+31/08/2024;19.52;4.52;Não
+01/09/2024;12.69;2.31;Não
+02/09/2024;10.32;4.68;Não
+03/09/2024;18.28;3.28;Não
+04/09/2024;11.67;3.33;Não
+05/09/2024;10.38;4.62;Não
+06/09/2024;11.24;3.76;Não
+07/09/2024;10.28;4.72;Não
+08/09/2024;14.95;0.05;Não
+09/09/2024;18.17;3.17;Não
+10/09/2024;11.48;3.52;Não
+11/09/2024;16;1.00;Não
+12/09/2024;15.49;0.49;Não
+13/09/2024;17.23;2.23;Não
+14/09/2024;19.63;4.63;Não
+15/09/2024;44.69;29.69;Sim
+16/09/2024;12.87;2.13;Não
+17/09/2024;16.35;1.35;Não
+18/09/2024;16.59;1.59;Não
+19/09/2024;17.18;2.18;Não
+20/09/2024;10.92;4.08;Não
+21/09/2024;15.16;0.16;Não
+22/09/2024;10.11;4.89;Não
+23/09/2024;11.15;3.85;Não
+24/09/2024;17.04;2.04;Não
+25/09/2024;17.46;2.46;Não
+26/09/2024;15.09;0.09;Não
+27/09/2024;13.88;1.12;Não
+28/09/2024;17.5;2.50;Não
+29/09/2024;15.46;0.46;Não
+30/09/2024;19.27;4.27;Não
+01/10/2024;15.76;0.76;Não
+02/10/2024;14.82;0.18;Não
+03/10/2024;14.36;0.64;Não
+04/10/2024;10.84;4.16;Não
+05/10/2024;12.1;2.90;Não
+06/10/2024;17.2;2.20;Não
+07/10/2024;12.07;2.93;Não
+08/10/2024;14.06;0.94;Não
+09/10/2024;12.95;2.05;Não
+10/10/2024;13.93;1.07;Não
+11/10/2024;13.37;1.63;Não
+12/10/2024;17.49;2.49;Não
+13/10/2024;10.06;4.94;Não
+14/10/2024;11.4;3.60;Não
+15/10/2024;16.63;1.63;Não
+16/10/2024;12.11;2.89;Não
+17/10/2024;14.66;0.34;Não
+18/10/2024;16.35;1.35;Não
+19/10/2024;15.6;0.60;Não
+20/10/2024;11.63;3.37;Não
+21/10/2024;17.56;2.56;Não
+22/10/2024;15.69;0.31;Não
+23/10/2024;11.57;3.43;Não
+24/10/2024;12.29;2.71;Não
+25/10/2024;18.77;3.77;Não
+26/10/2024;14.91;0.09;Não
+27/10/2024;10.89;4.11;Não
+28/10/2024;13.11;1.89;Não
+29/10/2024;14.04;0.04;Não
+30/10/2024;12.68;2.32;Não
+31/10/2024;11.73;3.27;Não
+01/11/2024;11.39;3.61;Não
+02/11/2024;13.9;1.10;Não
+03/11/2024;18.22;3.22;Não
+04/11/2024;12.96;2.04;Não
+05/11/2024;16.39;1.39;Não
+06/11/2024;15.53;0.53;Não`;
+
+    const lines = data.split('\n').map(line => line.split(';'));
+    const headers = lines[0];
+    const flowRateIndex = headers.indexOf('Flow Rate (L/min)');
+    const mseIndex = headers.indexOf('MSE');
+    const anomalyIndex = headers.indexOf('Anomaly');
+    const labels = lines.slice(1).map(line => line[0]);
+    const flowRates = lines.slice(1).map(line => parseFloat(line[flowRateIndex]));
+    const mses = lines.slice(1).map(line => parseFloat(line[mseIndex]));
+    const anomalies = lines.slice(1).map(line => line[anomalyIndex]);
+
+    // Criação do gráfico
+    const ctx = document.getElementById('myChart').getContext('2d');
+    
+    // Obtendo o índice do mês atual
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth(); // 0 = Janeiro, 1 = Fevereiro, ..., 11 = Dezembro
+    const currentYear = currentDate.getFullYear();
+    
+    // Obtendo o índice do mês atual na lista de rótulos
+    const monthLabel = `${currentMonth + 1}/01/${currentYear}`;
+    const currentMonthIndex = labels.findIndex(label => label.startsWith(monthLabel));
+
+    const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Taxa de Fluxo (L/min)',
+                    data: flowRates,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'MSE',
+                    data: mses,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                // Adicionando uma linha vertical para marcar o mês atual
+                annotation: {
+                    annotations: {
+                        line: {
+                            type: 'line',
+                            yMin: 0,
+                            yMax: Math.max(...flowRates) + 1, // Y máximo
+                            xMin: currentMonthIndex,
+                            xMax: currentMonthIndex,
+                            borderColor: 'red',
+                            borderWidth: 2,
+                            label: {
+                                content: 'Mês Atual',
+                                enabled: true,
+                                position: 'top'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Preenchendo a tabela
+    const tableBody = document.getElementById('data-table-body');
+    lines.slice(1).forEach(line => {
+        const row = document.createElement('tr');
+        line.forEach(cell => {
+            const cellElement = document.createElement('td');
+            cellElement.textContent = cell;
+            row.appendChild(cellElement);
+        });
+        tableBody.appendChild(row);
+    });
+</script>
+
+</body>
+</html>

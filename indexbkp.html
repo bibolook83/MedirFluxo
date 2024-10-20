@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Water Flow Monitoring</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+</head>
+<body>
+
+    <h2>Water Flow Real-Time Chart</h2>
+    <canvas id="flowChart" width="400" height="200"></canvas>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCal-PnkBCOt978elZoXe0jLQd2ls7ARmU",
+            authDomain: "SEU_AUTH_DOMAIN",
+            databaseURL: "https://medirfluxo-default-rtdb.firebaseio.com/ ",
+            projectId: "medirfluxo  ",
+            storageBucket: "SEU_STORAGE_BUCKET",
+            messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        // Inicializar o Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Configuração do gráfico Chart.js
+        const ctx = document.getElementById('flowChart').getContext('2d');
+        const flowChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Labels do eixo X (tempo, por exemplo)
+                datasets: [{
+                    label: 'Water Flow (L/min)',
+                    data: [], // Dados de fluxo de água
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'second'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Flow (L/min)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Atualizar gráfico em tempo real com dados do Firebase
+        const flowDataRef = firebase.database().ref('waterFlow');
+        flowDataRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+
+            // Supondo que os dados do Firebase sejam do tipo {timestamp: valor}
+            const timestamps = Object.keys(data);
+            const flowValues = Object.values(data);
+
+            // Atualizar gráfico
+            flowChart.data.labels = timestamps;
+            flowChart.data.datasets[0].data = flowValues;
+            flowChart.update();
+        });
+    </script>
+
+</body>
+</html>

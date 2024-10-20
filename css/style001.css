@@ -1,0 +1,106 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+}
+
+/* Estilo para o menu lateral */
+.sidebar {
+    height: 100vh;
+    width: 60px; /* Menu lateral menor */
+    background-color: #333;
+    color: white;
+    padding-top: 20px;
+    position: fixed;
+    transition: width 0.3s; /* Animação para abrir e fechar */
+    overflow: hidden;
+    z-index: 1;
+}
+
+.sidebar.open {
+    width: 250px; /* Largura do menu quando aberto */
+}
+
+.sidebar a {
+    padding: 15px 20px;
+    text-decoration: none;
+    color: white;
+    display: block;
+    transition: 0.3s;
+    white-space: nowrap; /* Evita quebra de texto */
+}
+
+.sidebar a:hover {
+    background-color: #575757;
+}
+
+.sidebar h2 {
+    margin-left: 20px;
+    display: none;
+}
+
+.sidebar.open h2 {
+    display: block;
+}
+
+/* Botão de abrir/fechar o menu */
+.toggle-menu {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    padding-left: 15px;
+}
+
+/* Estilo para o conteúdo principal */
+.main-content {
+    margin-left: 60px;
+    padding: 20px;
+    width: calc(100% - 60px);
+    transition: margin-left 0.3s;
+}
+
+.sidebar.open ~ .main-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+}
+
+/* Tamanho maior para o gráfico */
+.chart-container {
+    width: 100%;
+    height: 500px; /* Aumenta a altura do gráfico */
+    margin-bottom: 30px;
+}
+
+/* Painel com barra de rolagem para a tabela */
+.table-panel {
+    width: 50%; /* Reduz o tamanho do painel */
+    max-height: 200px; /* Altura fixa com rolagem */
+    overflow-y: auto; /* Barra de rolagem vertical */
+    border: 1px solid #ddd;
+    margin-top: 20px;
+}
+
+/* Estilo para o grid (menor) */
+table {
+    width: 100%; /* Tabela ocupa 100% do painel */
+    border-collapse: collapse;
+    font-size: 0.9em; /* Texto menor na tabela */
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #333;
+    color: white;
+}

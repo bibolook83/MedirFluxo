@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitorando Fluxo de Água - 30 Dias</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 60px;
+            background-color: #333;
+            color: white;
+            padding-top: 20px;
+            position: fixed;
+            transition: width 0.3s;
+            overflow: hidden;
+        }
+
+        .sidebar.open {
+            width: 250px;
+        }
+
+        .sidebar a {
+            padding: 15px 20px;
+            text-decoration: none;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+
+        .sidebar h2 {
+            margin-left: 20px;
+            display: none;
+        }
+
+        .sidebar.open h2 {
+            display: block;
+        }
+
+        .toggle-menu {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            padding-left: 15px;
+        }
+
+        .main-content {
+            margin-left: 60px;
+            padding: 20px;
+            width: calc(100% - 60px);
+            transition: margin-left 0.3s;
+        }
+
+        .sidebar.open ~ .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+
+        .data-panel {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .table-panel, .anomaly-panel {
+            width: 48%;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        .anomaly {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .no-anomaly {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        /* Estilo do iframe */
+        iframe {
+            width: 100%;
+            height: 500px; /* Ajuste a altura conforme necessário */
+            border: none; /* Remove a borda padrão */
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Menu lateral -->
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-menu" id="toggleMenuBtn">☰</button>
+        <a href="#">Hidrometro</a>
+        <a href="#">Fluxo de Água</a>
+        <a href="#" id="anomaliesLink">Anomalias</a>
+        <a href="#">Configuração</a>
+        <a href="#">Ajuda</a>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="main-content" id="mainContent">
+        <h2>Monitorando Fluxo de Água - 30 Dias</h2>
+
+        <!-- Gráfico -->
+        <div class="chart-container">
+            <canvas id="flowChart"></canvas>
+        </div>
+
+        <!-- Painel de dados (tabela de fluxo + anomalias) -->
+        <div class="data-panel">
+            <!-- Tabela de fluxo de água -->
+            <div class="table-panel">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Fluxo de Água (L/min)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="flowTableBody">
+                        <!-- Linhas da tabela serão preenchidas dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tabela de anomalias -->
+            <div class="anomaly-panel">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Fluxo (L/min)</th>
+                            <th>MSE</th>
+                            <th>Anomalia</th>
+                        </tr>
+                    </thead>
+                    <tbody id="anomalyTableBody">
+                        <!-- Linhas da tabela de anomalias serão preenchidas dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Iframe para exibir result.html -->
+        <iframe id="resultIframe" src="" style="display: none;"></iframe>
+    </div>
+
+    <script>
+        const toggleMenuBtn = document.getElementById('toggleMenuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const anomaliesLink = document.getElementById('anomaliesLink');
+        const resultIframe = document.getElementById('resultIframe');
+
+        toggleMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        anomaliesLink.addEventListener('click', (event) => {
+            event.preventDefault(); // Previne o comportamento padrão do link
+            resultIframe.src = "result.html"; // Define a URL do iframe
+            resultIframe.style.display = "block"; // Exibe o iframe
+        });
+
+        // Função para gerar uma data no formato YYYY-MM-DD
+        function generateDate(daysAgo) {
+            const today = new Date();
+            const pastDate = new Date(today);
+            pastDate.setDate(today.getDate() - daysAgo);
+            return pastDate.toISOString().split('T')[0];
+        }
+
+        // Gerar dados fictícios para os últimos 30 dias
+        const labels = [];
+        const flowData = [];
+        const mseData = [];
+        const anomalyData = [];
+
+        // Cálculo do MSE baseado no fluxo gerado
+        function calculateMSE(flowRate) {
+            // Usando uma média simples como base para o cálculo do erro
+            const avgFlow = 5.0; // valor fictício como referência de fluxo normal
+            const mse = Math.pow(flowRate - avgFlow, 2).toFixed(4);
+            return mse;
+        }
+
+        for (let i = 29; i >= 0; i--) {
+            const date = generateDate(i);
+            labels.push(date);
+
+            const flowRate = (Math.random() * 10).toFixed(2);
+            flowData.push(flowRate);
+
+            const mse = calculateMSE(flowRate);
+            mseData.push(mse);
+
+            const isAnomaly = mse > 0.25 ? 'Sim' : 'Não';
+            anomalyData.push(isAnomaly);
+        }
+
+        // Preencher a tabela de fluxo de água
+        const flowTableBody = document.getElementById('flowTableBody');
+        for (let i = 0; i < labels.length; i++) {
+            const row = document.createElement('tr');
+            const dateCell = document.createElement('td');
+            const flowCell = document.createElement('td');
+
+            dateCell.textContent = labels[i];
+            flowCell.textContent = flowData[i];
+
+            row.appendChild(dateCell);
+            row.appendChild(flowCell);
+            flowTableBody.appendChild(row);
+        }
+
+        // Preencher a tabela de anomalias com a nova coluna de Fluxo
+        const anomalyTableBody = document.getElementById('anomalyTableBody');
+        for (let i = 0; i < labels.length; i++) {
+            const row = document.createElement('tr');
+            const dateCell = document.createElement('td');
+            const flowCell = document.createElement('td');
+            const mseCell = document.createElement('td');
+            const anomalyCell = document.createElement('td');
+
+            dateCell.textContent = labels[i];
+            flowCell.textContent = flowData[i]; // Preenche com os mesmos dados de fluxo
+            mseCell.textContent = mseData[i];
+            anomalyCell.textContent = anomalyData[i];
+
+            // Aplica a classe à linha inteira
+            row.classList.add(anomalyData[i] === 'Sim' ? 'anomaly' : 'no-anomaly');
+
+            row.appendChild(dateCell);
+            row.appendChild(flowCell);  // Adiciona a nova célula de fluxo
+            row.appendChild(mseCell);
+            row.appendChild(anomalyCell);
+            anomalyTableBody.appendChild(row);
+        }
+
+        // Configuração do gráfico Chart.js
+        const ctx = document.getElementById('flowChart').getContext('2d');
+        const flowChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Water Flow (L/min)',
+                    data: flowData,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // Cor de preenchimento abaixo da linha
+                    fill: true // Preenche a área abaixo da linha
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Flow (L/min)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
