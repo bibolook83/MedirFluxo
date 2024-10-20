@@ -27,6 +27,10 @@ Este projeto consiste em um painel de monitoramento de fluxo de água, desenvolv
 ![Water Flow Monitoring Dashboard](/img/img06.png)
 ![Water Flow Monitoring Dashboard](/img/img07.png)
 
+## Gráfico realtime
+![Water Flow Monitoring Dashboard](/img/img08.jpeg)
+
+
 
 ## Configuração
 
