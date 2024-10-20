@@ -11,8 +11,8 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // Configurações do Firebase
-#define FIREBASE_HOST "https://medirfluxo-default-rtdb.firebaseio.com"  // host do Firebase
-#define FIREBASE_AUTH "AIzaSyCal-PnkBCOt978elZoXe0jLQd2ls7ARmU"  // chave de autenticação do Firebase
+#define FIREBASE_HOST "https://SEUHOST.firebaseio.com"  // host do Firebase
+#define FIREBASE_AUTH "KEY"  // chave de autenticação do Firebase
 
 // Configurações do Wi-Fi
 const char* ssid = "SEU_SSID";  // SSID
