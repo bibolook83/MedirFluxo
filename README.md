@@ -39,7 +39,7 @@ Firebase Realtime Database é utilizado para armazenar os dados históricos de f
 - **Chart.js**: Uma biblioteca poderosa para criar gráficos e visualizar dados de forma interativa.
 
 ## Screenshot
-
+![Water Flow Monitoring Dashboard](/img/img09.jpeg)
 ![Water Flow Monitoring Dashboard](/img/img01.jpeg)
 ![Water Flow Monitoring Dashboard](/img/img02.jpeg)
 ![Water Flow Monitoring Dashboard](/img/img03.jpeg)
