@@ -9,6 +9,28 @@ Este projeto consiste em um painel de monitoramento de fluxo de água, desenvolv
 - **Layout responsivo**: inclui uma barra lateral para navegação e uma área de conteúdo principal responsiva que se ajusta a diferentes tamanhos de tela.
 - **Barra lateral do menu**: um menu simples para navegar por diferentes seções (atualmente links não funcionais para demonstração).
 
+## Detecção de Anomalias com Machine Learning
+
+Este projeto utiliza técnicas de Machine Learning para detectar anomalias no fluxo de água com base nos dados coletados pelo sensor de fluxo YF-S201. O objetivo é identificar padrões incomuns de consumo de água que possam indicar vazamentos ou outras irregularidades.
+
+Algoritmo Utilizado
+O método utilizado para a detecção de anomalias é baseado no cálculo do Erro Quadrático Médio (MSE), comparando a taxa de fluxo de água real com a prevista por um modelo de aprendizado de máquina. As anomalias são identificadas quando o MSE ultrapassa um certo limiar, indicando um desvio significativo dos padrões esperados.
+
+Algoritmo: Mapas Auto-Organizados (SOM - Self-Organizing Maps)
+Métricas:
+Taxa de fluxo de água: medida em litros por minuto (L/min).
+Erro de reconstrução (MSE): erro calculado com base na diferença entre o fluxo previsto e o fluxo real.
+Visualização dos Resultados
+No painel, os resultados da detecção de anomalias são exibidos tanto em um gráfico de linha quanto em uma tabela detalhada:
+
+Gráfico de linha em tempo real: mostra a taxa de fluxo de água e marca as anomalias identificadas.
+Tabela: lista os valores de fluxo de água e o MSE para cada dia, destacando as anomalias com cores diferenciadas.
+As anomalias são destacadas visualmente para facilitar a identificação rápida de padrões incomuns no consumo de água.
+
+Implementação do Machine Learning
+Mapas Auto-Organizados (SOM) são utilizados para mapear os dados de fluxo de água em uma rede neural não supervisionada. Este algoritmo ajuda a identificar padrões de consumo normais e fora do comum.
+Firebase Realtime Database é utilizado para armazenar os dados históricos de fluxo de água. Esses dados são posteriormente processados para treinar o modelo de aprendizado de máquina.
+
 ## Tecnologias usadas
 
 - **HTML5**: para estrutura e conteúdo.
